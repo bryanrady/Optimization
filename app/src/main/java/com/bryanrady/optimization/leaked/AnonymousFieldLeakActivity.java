@@ -73,7 +73,7 @@ public class AnonymousFieldLeakActivity extends AppCompatActivity {
                 LeakThread leakThread = new LeakThread();
                 leakThread.start();
 
-                
+
                 new Handler(){
                     @Override
                     public void handleMessage(@NonNull Message msg) {
