@@ -1,0 +1,463 @@
+﻿一、App启动优化
+	
+	App启动分为冷启动、温启动、热启动。
+	
+	冷启动：是指APP在手机启动后第一次运行，或者APP进程被kill掉后再次启动，可见冷启动的必要条件是该APP进程不存在，
+			这就意味着系统需要创建进程，APP需要初始化。
+			
+			
+	温启动：App进程还存在，当时Activity可能因为内存不足被回收。这时候启动App不需要重新创建进程，但是Activity的
+			onCrate还是需要重新执行的，也就是要重新进行初始化和布局解析绘制。场景类似打开淘宝逛了一圈然后切到微
+			信去聊天去了，过了半小时再次回到淘宝。这时候淘宝的进程存在，但是Activity可能被回收，这时候只需要重新
+			加载Activity即可。
+			
+			
+	热启动：App进程还存在，并且Activity对象仍然存在内存中没有被回收。可以重复避免对象初始化，布局解析绘制。
+			场景就类似你打开微信聊了一会天这时候出去看了下日历，然后再打开微信，微信这时候启动就属于热启动。
+	
+
+	App启动优化主要是针对冷启动来进行优化。冷启动从点击Launcher图标开始，最先开始通过Zygote进程来孵化APP应用进程，
+	然后应用进程就会创建我们的应用程序对象Application, 启动主线程，然后创建我们的Activity对象，然后进行布局解析绘制视图到我们
+	的屏幕。
+	
+	在这一过程中，当APP应用进程创建后，应用进程就会显示一个属于应用程序的空白窗口，这就是为什么冷启动会出现黑白屏的原因？
+	而一旦App进程完成了第一个Activty的绘制，应用进程就会用Activity的布局替换已经展示的空白窗口。
+	
+	
+	针对这种现象我们可以来对冷启动的应用程序来进行优化，优化点在哪里呢？
+	
+	1. 视觉体验优化  首先是针对应用进程创建后直到我们的Activity绘制完成这段时间的黑白屏进行优化，有两种做法可以实现
+	
+		（1）设置透明主题
+
+				<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+					..........
+
+					<item name="android:windowIsTranslucent">true</item>
+				</style>
+
+				
+			将这个空白页（黑白屏）设置成充满屏幕并且透明，这样的话就看不到黑白屏界面了，但是再点击Launcher图标的时候，会给
+			用户有一种有延迟的效果，就是点击了图标后过一会才显示出来我们的Activity，这样体验不是太好。
+
+
+		（2）设置背景图片主题
+
+			(a) 把这个样式设置给启动的SplashActivity
+
+			    	<style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        				<item name="android:windowBackground">@mipmap/bg_splash</item>
+    				</style>
+
+			(b)然后在SplashActivity的onCreate方法，把Activity设置回原来的主题
+
+				protected void onCreate(Bundle savedInstanceState) {
+        					//替换为原来的主题，在onCreate之前调用
+        					setTheme(R.style.AppTheme);
+       		 			super.onCreate(savedInstanceState);
+    				}
+
+
+			这样在启动时就通过给用户看一张图片或是广告来防止黑白屏的尴尬，这种效果会给用户一种
+			秒开程序的体验，但是实际上并没有真正的加块我们应用程序的启动速度，指标不治本。
+			
+	
+	2.代码逻辑优化	想要真正加快应用程序的启动速度，关键还在于逻辑代码的优化，这一块代码就存在于Application的onCreate()和Activity的onCreate()中，不要在这两个方法中做大量的初始化工作，
+			还有一个就是xml文件的优化
+	
+	
+				通过命令查看应用程序的启动时间： adb shell am start -W 包名/类名
+	
+				杀死进程执行命令
+				am start -W com.hxd.oasynergytest/com.hxd.gobus.mvp.activity.SplashActivity 
+				
+				Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.hxd.oasynergytest/com.hxd.gobus.mvp.activity.SplashActivity }
+				Status: ok
+				Activity: com.hxd.oasynergytest/com.hxd.gobus.mvp.activity.LoginActivity
+				ThisTime: 231
+				TotalTime: 984
+				WaitTime: 1012
+				Complete
+				
+				ThisTime  : 最后一个 Activity 的启动耗时(例如从 SplashActivity -> LoginActivity , 只统计 LoginActivity 的启动耗时)
+				
+				TotalTime : 启动一连串的 Activity 总耗时(有几个Activity 就统计几个)
+				
+				WaitTime : 进程的创建时间 + TotalTime 
+				
+				
+				我们可以通过Debug.startMethodTracing()和 Debug.stopMethodTracing() 来检测初始化第三方SDK的耗时时长，这里把文件写到了sd卡中，然后把文件拖进AS里面我们可以
+				通过查看trace文件来分析初始化第三方SDK的耗时时长。然后找到里面比较耗时的操作，然后再进行优化
+				
+				public void onCreate() {
+						super.onCreate();
+						File file = new File(Environment.getExternalStorageDirectory(),"app_trace");
+						Debug.startMethodTracing(file.getAbsolutePath());
+						
+						initThirdSdk();
+						
+						Debug.stopMethodTracing();
+				}   
+					
+				针对我的项目的启动时间：
+				
+					优化之前：311482 微妙
+					优化之后：3356 微妙
+				   
+				
+				优化方式：
+				
+					1. 把第三方组件的初始化放在子线程中进行初始化，但是有些组件的初始化可能会报错，因为它内部可能会涉及到Handler操作，UI操作，异步操作等。
+					    建议对放在子线程初始化的组件进行延时加载，这样就可以了解是否会对项目造成影响。
+						
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+							
+								//设置线程的优先级，不与主线程抢资源
+								Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+								//子线程初始化第三方组件
+								Thread.sleep(5000);//建议延迟初始化，可以发现是否影响其它功能，或者是崩溃！
+							}
+						}).start();
+						
+						
+					2. 将必须放在主线程中初始化的组件并且这些组件不用立即初始化完成的操作也进行延迟加载。
+					
+							handler.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									//延迟初始化组件
+									init();
+								}
+							}, 3000);
+				
+
+					3. 对组件初始化进行懒加载操作，懒汉式单例模式保证懒加载，只不过第一次稍微会慢一点。
+					
+					
+					
+二、布局优化
+
+	1. GPU CPU负责计算好要绘制图形的数据，然后把计算好的数据交给GPU，GPU负责对图形的数据进行渲染，负责栅格化操作，就是根据图形坐标进行像素填充操作，然后显示到手机屏幕上。
+	
+		在布局文件中我们写一个Button（Button里面含有位置信息），然后通过xml解析加载到内存中，然后cpu进行计算处理成多维的向量图形(也就是纹理)，然后将向量图形交给GPU进行像素填充，
+		这一步就是栅格化操作，然后GPU绘制成图形
+		
+	2. 为什么会有卡顿？
+		（1）60fps 在与手机的交互过程中，手机画面反馈当fps在60以下，人眼是能感觉出来的，所以当帧率低于60fps的情况下我们能感觉到画面有卡顿和延迟现象；
+		
+		（2）Android系统每隔16ms(1000ms/60fps = 16.66ms)发出VSync(垂直同步信号), 触发对UI的渲染，如果每次渲染都能够按照这样的情况就能达到60fps的流畅画面，
+			为了能实现60fps,所以计算渲染的大多数操作都必须在16ms之内完成。如果这一帧的图像的计算操作能够在16ms内，那就绘制，如果大于16ms，就等待下一个信号
+			继续进行计算，这样就会导致这一个16ms没有绘制图像（60帧就变成了59帧，造成丢帧），然后就到下下一个16ms, 或者更多时间才能绘制出图像。
+			
+		 (3)卡顿原理分析	如果这一帧画面的渲染时间超过16ms，垂直同步机制会让硬件等待GPU完成栅格化操作，这样的话就会让这一帧画面多停留16ms，甚至更多时间，
+							这样就会造成有些图像没有进行绘制，这样就造成了用户看到的画面会有停顿
+			 
+			 
+	3.优化点： 16ms的时间主要做的事情有两个：第一个是将UI对象转换为一系列多边形和纹理，第二个就是CPU传递数据到GPU。所以我们要减少UI对象的转换次数和上传数据到GPU的次数。
+	
+			   那么如何减少这两个部分的时间呢？	第一个就是GPU减少xml布局文件转换成UI对象的时间；第二个是GPU减少重复绘制的时间
+			   
+	4.优化：4.1 减少布局嵌套，把不必要的布局去掉
+				通过Hierarchyviewer布局层次，但是在AS3.1后就被去掉了这个东西，现在使用Layout Inspector来代替，Tools -> Layout Inspector
+				
+				include、merge 、ViewStub这三个布局都是官方提供的用于布局优化的
+				
+				include	能够引入另外一个xml布局到当前布局中
+				
+							对于一些都需要的布局如Toolbar，我们可以通过include来进行引用,这样的好处是可以减少上传Toolbar的纹理到GPU的过程，
+							如果每个布局文件都写了Toolbar，那么每个布局的Toolbar都是不同的对象，这样就会造成多次上传，如果通过include来引用，
+							就只会上传一次Toolbar的布局，然后再GPU进行缓存，下次再用的时候直接从缓存中拿即可
+				
+				merge	减少布局层级,不会增加层级会被系统自动忽略 	
+							如果xml的根部局是FrameLayout, 直接替换成merge就能减少一个布局深度，因为DecorView本身就是一个FrameLayout。
+							
+				ViewStub	ViewStub是一个不可见，不用占用资源，只有设置viewstub为visible、invisible或者调用其inflater()方法时，其对应的布局文件才会被初始化。
+							局限是viewstub的引用对象需要是一个布局layout文件，如果要是单个的view的话，viewstub就不合适了
+								
+	
+			4.2 减少过度绘制，在开发者选项里有显示过度绘制区域选项，一共有4层：
+					紫色：绘制一层
+					绿色：绘制两层
+					浅红：绘制三层
+					深红：绘制四层
+					
+				如果我们看到我们的布局都是一堆红红的，那就是过度绘制了
+				
+				过度绘制的情况：
+					（1）自定义控件中，onDraw()做了太多的重复绘制。
+					
+							控制好代码逻辑，尽量让用户看不到的区域不要进行绘制，比如重叠卡片，我们就可以对看不到的卡片区域进行不绘制，
+							可以通过clipRect来实现画布裁剪，canvas.clipRect(0, 0, 200, 200)，指定(0,0)到(200,200)的矩形区域为绘制区域，
+							而且还要为下一次绘制操作做准备，retore()恢复画布成原来的
+					
+					（2）布局层次太多，重叠性太强，GPU在用户看不到的区域也会进行渲染，导致耗时增加
+					
+							我们可以在项目需求的前提下，减少UI背景的绘制次数，从background属性着手。
+							
+			在平时编码的时候注意布局的编写，达到优化的效果，最后我们还可以通过Lint来检测布局，Analyze -> Inspect Code   按照Lint的提示修改布局即可。
+			
+	
+三、内存泄漏
+
+	1. java虚拟机
+			sun公司指定的java虚拟机规范中，把java虚拟机分为 线程私有 和 共享数据区 两大部分。
+
+		1.1 线程私有
+		
+			（1）PC 程序计数器  
+			
+					内存空间小，线程私有。字节码解释器工作是就是通过改变这个计数器的值来选取下一条需要执行指令的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖计数器完成
+					
+					如果线程正在执行一个 Java 方法	这个计数器记录的是正在执行的虚拟机字节码指令的地址
+						
+					如果正在执行的是 Native 方法	这个计数器的值则为 (Undefined)
+					
+					这个内存区域是唯一一个在 Java 虚拟机规范中没有规定任何 OutOfMemory 情况的区域。
+			
+			（2）虚拟机栈	
+			
+					线程私有，生命周期和线程一致。描述的是 Java 方法执行的内存模型：每个方法在执行时都会创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息。
+					每一个方法从调用直到执行结束，就对应着一个栈帧从虚拟机栈中入栈到出栈的过程。
+					
+					局部变量表：存放了编译期可知的各种基本类型(boolean、byte、char、short、int、float、long、double)、对象引用(reference 类型)和 return Address 类型(指向了一条字节码指令的地址)
+					
+					这个内存区域定义了两个异常：
+					
+					StackOverflow		线程请求的栈深度大于虚拟机所允许的深度
+					
+					OutOfMemory		如果虚拟机栈可以动态扩展，而扩展时无法申请到足够的内存。
+		
+			（3）本地方法栈	
+	
+					区别于 虚拟机栈的是，虚拟机栈为虚拟机执行 Java 方法(也就是字节码)服务，而本地方法栈则为虚拟机使用到的 Native 方法服务。
+					
+					这个内存区域也会有 StackOverflowError 和 OutOfMemoryError 异常
+					
+					在有些jvm的实现当中，比如sun公司的hotspot虚拟机，它将虚拟机栈和本地方法栈合二为一了
+					
+		1.2 共享数据区
+
+			（1）方法区
+			
+				主要存放的是:
+					
+					ClassLoader加载进来的是Class信息
+					
+					常量
+					
+					静态变量
+					
+					即时编译器编译后的代码信息
+					
+					一些特殊的Class对象
+				
+				
+				运行时常量池
+				
+					方法区里面还有一部分是 运行时常量池	存放编译期生成的各种字面量和符号引用
+				
+					字面量  	String类型常量	八种基本类型的值	final常量
+					
+					符号引用	类/接口全名  字段名  方法名
+					
+					内存有限，无法申请时抛出 OutOfMemoryError。
+					
+			（2）java堆	
+					
+					java虚拟机管理的最大的内存，也是GC的主战场，主要存放对象实例和数组，里面定义了OOM异常
+					
+					
+					
+	2. GC如何确定一个对象能否被回收?				
+					
+					
+		2.1 引用计数算法	在垃圾回收器的早期策略是使用的 引用计数算法 来判断一个对象是否存活
+
+				A a = new A();		a的引用计数 		= 1
+				B b = new B();		b的引用计数			= 1
+					
+				a.bb = b;			a的引用计数 +1 		= 2
+				b.aa = a;			b的引用计数 +1 		= 2
+				
+				a = null;
+				b = null;
+				
+				现在a和b互相引用，现在即使 a = null; b = null; 但是A类对象仍然被B类对象中的字段引用着，B类的对象也仍然被A类对象中的字段引用着
+				尽管现在A类和B类对象都已经访问不到了，但是引用计数却都不为0，所以都不会a和b都不会被回收
+				
+				
+		2.2 可达性分析算法（主流算法）			
+					
+				通过一系列的被称为“gc roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链，当一个对象到“gc roots”没有任何引用链相连时，
+				则证明此对象是不可用的，可以被回收。	
+				
+				GC ROOTS				
+					|
+					|
+				 Object1						Object5
+				  /	 \							 /	\	
+				 /	  \						    /    \
+			Object2  Object3				Object6  Object7
+			   |	
+			   |
+			Object4 
+
+				Object1，Object2，Object3，Object4	对象仍然存活，不能被回收
+				
+				Object5，Object6，Object7			可以被回收
+			
+				
+				如果我们的对象经过第一次可达性分析算法发现跟gc roots没有引用链，就证明这个对象可以被回收，但是gc不会立即回收，java中还有一个自救的方法 finalize()。
+				
+				
+				@Override
+				protected void finalize() throws Throwable {
+					super.finalize();
+					//自救操作
+					a = this;
+				}  
+
+				如果gc第2次可达性分析算法发现这个对象还是没有到gc roots的引用链，就会直接回收这个对象。finalize()只会对第一次扫描的对象进行死缓，提供自救。
+				如果gc第2次可达性分析算法发现这个对象有到gc roots的引用链，就不会被回收
+			
+				
+			可以作为“gc roots”的对象
+
+					（1）虚拟机栈（栈帧中的局部变量表）中引用的对象
+
+					（2）方法区中类静态属性引用的对象。
+
+					（3）方法区中常量引用的对象
+
+					（4）本地方法栈中JNI引用的对象
+					
+					
+		2.3 引用 
+			
+			java中有四种引用 强，软，弱，虚
+			
+			强引用
+			
+				Object obj = new Object();		obj是指向Object对象的一个强引用
+			
+				如果一个对象拥有强引用，就算系统进行gc，强引用对象也不会被回收，即时爆出OOM该对象也不会被回收
+			
+			软引用	SoftReference
+			
+				Object obj = new Object();
+				SoftReference softObj = new SoftReference<Object>(obj);
+				
+			
+				内存足够时，软引用对象不会被回收，只有在内存不足时，系统才会回收软引用对象，通常用于实现缓存
+				
+			弱引用	WeakReference
+			
+			    Object obj = new Object();
+				WeakReference<Object> weakObj = new WeakReference<>(obj3);
+				
+				只要系统进行gc，弱引用对象就一定会被回收
+				
+			虚引用	PhantomReference
+			
+				如果一个对象持有虚引用，那么这个对象随时可能被回收，甚至不能通过get方法来获得其指向的对象。
+				虚引用唯一的作用是，当其指向的对象被回收后，自己被加入到引用队列，用做记录该引用指向的对象已被销毁。
+
+				
+			引用队列：从下面例子可以看出，被回收的对象都会被加入到引用队列中	
+			
+				
+			//引用队列	
+			ReferenceQueue<Object> referenceQueue = new ReferenceQueue<>();
+
+			//软引用
+			Object obj2 = new Object();
+			SoftReference<Object> softObj = new SoftReference<>(obj2, referenceQueue);
+
+			System.out.println("gc之前 soft ：" + softObj.get());
+			System.out.println("gc之前 soft queue：" + referenceQueue.poll());
+
+			obj2 = null;
+			System.gc();
+			Thread.sleep(1000);
+
+			System.out.println("gc之后 soft：" + softObj.get());
+			System.out.println("gc之后 soft queue：" + referenceQueue.poll());
+
+			//弱引用
+			Object obj3 = new Object();
+			WeakReference<Object> weakObj = new WeakReference<>(obj3, referenceQueue);
+
+			System.out.println("gc之前 weak：" + weakObj.get());
+			System.out.println("gc之前 weak queue：" + referenceQueue.poll());
+
+			obj3 = null;
+			System.gc();
+			Thread.sleep(1000);
+
+			System.out.println("gc之后 weak：" + weakObj.get());
+			System.out.println("gc之后 weak queue：" + referenceQueue.poll());
+
+			//虚引用
+			Object obj4 = new Object();
+			PhantomReference<Object> plantomObj = new PhantomReference<>(obj4, referenceQueue);
+
+			System.out.println("gc之前 plantom：" + plantomObj.get());
+			System.out.println("gc之前 plantom queue：" + referenceQueue.poll());
+
+			obj4 = null;
+			System.gc();
+			Thread.sleep(1000);
+
+			System.out.println("gc之后 plantom：" + plantomObj.get());
+			System.out.println("gc之后 plantom queue：" + referenceQueue.poll());
+
+			
+			gc之前 soft ：java.lang.Object@759ebb3d
+			gc之前 soft queue：null
+			gc之后 soft：java.lang.Object@759ebb3d
+			gc之后 soft queue：null
+			gc之前 weak：java.lang.Object@484b61fc
+			gc之前 weak queue：null
+			gc之后 weak：null
+			gc之后 weak queue：java.lang.ref.WeakReference@45fe3ee3
+			gc之前 plantom：null
+			gc之前 plantom queue：null
+			gc之后 plantom：null
+			gc之后 plantom queue：java.lang.ref.PhantomReference@4cdf35a9
+		
+			在Android应用的开发中，为了防止内存溢出，在处理一些占用内存大而且生命周期较长的对象时候，可以尽量应用软引用和弱引用技术。
+			对于软引用和弱引用的选择，如果只是想避免OutOfMemory异常的发生，则可以使用软引用。如果对于应用的性能更在意，想尽快回收一些占用内存比较大的对象，则可以使用弱引用。
+			另外可以根据对象是否经常使用来判断选择软引用还是弱引用。如果该对象可能会经常使用的，就尽量用软引用。如果该对象不被使用的可能性更大些，就可以用弱引用。
+
+			
+	3.内存泄漏
+			
+		3.1 内存泄漏的根本原因
+			
+			堆内存中的长生命周期对象持有短生命周期对象的引用，尽管短生命周期对象已经不再需要，但是因为长生命周期对象持有它的引用而导致不能被回收。
+			
+			总结一句话就是不需要了该回收因为引用问题导致不能回收。内存泄漏会导致可用内存慢慢变少，让程序慢慢变卡。最终还会导致oom 内存溢出。
+		
+		3.2 应该怎么排查内存泄漏问题？			
+
+			在android中我们执行一段代码，比如进入了一个新的页面(Activity)，这时候我们的内存使用肯定比在前一个页面大，而在界面finish返回后，
+			如果内存没有回落，那么很有可能就是出现了内存泄漏。
+
+			我们可以通过AS的Memory Profile或者DDMS中的heap观察内存使用情况。从内存监控工具中观察内存曲线，是否存在不断上升的趋势且不会在程序返回时明显回落。
+			这种方式可以发现最基本，也是最明显的内存泄露问题，对用户价值最大，操作难度小，性价比极高。	
+
+		3.3 造成内存泄漏的常见情况
+		
+			（1）集合中的对象未清理造成的内存泄露
+			
+				如果一个对象放入到ArrayList、HashMap等集合中，这个集合就会持有该对象的引用。当我们不再需要这个对象时，也并没有将它从集合中移除，
+				这样只要集合还在使用（而此对象已经无用了），这个对象就造成了内存泄露。并且如果集合被静态引用的话，集合里面那些没有用的对象更会
+				造成内存泄露了。所以在使用集合时要及时将不用的对象从集合remove，或者clear集合，以避免造成对象的内存无法被回收,从而造成内存泄漏。
+		
+			（2）非静态内部类造成的内存泄漏		
+				
+				
+	
