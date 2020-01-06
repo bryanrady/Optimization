@@ -16,5 +16,4 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
-
 }

@@ -3,13 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:onClick="leaked"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_prompt"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="内存泄漏测试" />
+        android:layout_centerInParent="true"
+        android:text="静态变量造成的内存泄漏">
+    </TextView>
 
 </RelativeLayout>
