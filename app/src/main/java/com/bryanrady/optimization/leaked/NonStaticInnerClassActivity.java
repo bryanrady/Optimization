@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
+ * https://www.imooc.com/article/70889
  * https://blog.csdn.net/liu3364575/article/details/80108312
  * https://www.jianshu.com/p/e766b52d84a9
  * 非静态内部类造成的内存泄漏
