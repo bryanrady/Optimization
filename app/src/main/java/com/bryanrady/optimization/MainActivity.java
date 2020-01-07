@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,4 +23,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //华为手机引发的泄漏
+        FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
+        FixLeakedUtils.fixInputMethodManagerLeak(this);
+    }
 }

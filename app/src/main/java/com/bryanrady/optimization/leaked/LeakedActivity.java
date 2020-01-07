@@ -30,4 +30,24 @@ public class LeakedActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AnonymousInnerClassLeakActivity.class);
         startActivity(intent);
     }
+
+    public void single_instance(View view) {
+        Intent intent = new Intent(this, SingleInstanceLeakActivity.class);
+        startActivity(intent);
+    }
+
+    public void unregister_remove(View view) {
+        Intent intent = new Intent(this, UnRegisterRemoveLeakActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //华为手机引发的泄漏
+        FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
+        FixLeakedUtils.fixInputMethodManagerLeak(this);
+    }
+
+
 }

@@ -2,6 +2,8 @@ package com.bryanrady.optimization;
 
 import android.os.Bundle;
 
+import com.bryanrady.optimization.leaked.FixLeakedUtils;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,4 +18,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //华为手机引发的泄漏
+        FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
+        FixLeakedUtils.fixInputMethodManagerLeak(this);
+    }
 }

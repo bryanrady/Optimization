@@ -137,4 +137,11 @@ public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //华为手机引发的泄漏
+        FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
+        FixLeakedUtils.fixInputMethodManagerLeak(this);
+    }
 }

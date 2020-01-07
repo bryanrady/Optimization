@@ -24,6 +24,8 @@
         <activity android:name=".leaked.StaticFieldLeakActivity"/>
         <activity android:name=".leaked.NonStaticInnerClassLeakActivity"/>
         <activity android:name=".leaked.AnonymousInnerClassLeakActivity"/>
+        <activity android:name=".leaked.SingleInstanceLeakActivity"/>
+        <activity android:name=".leaked.UnRegisterRemoveLeakActivity"/>
 
     </application>
 

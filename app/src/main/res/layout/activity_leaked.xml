@@ -29,6 +29,24 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="匿名内部类造成的内存泄漏" />
+        android:text="匿名内部类内部有耗时任务造成的内存泄漏" />
+
+    <Button
+        android:onClick="single_instance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="单例模式持有Activity或Service的引用造成的内存泄漏" />
+
+    <Button
+        android:onClick="unregister_remove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="广播、系统服务回调接口、观察者未取消注册监听或回调的造成的内存泄漏" />
 
 </LinearLayout>

@@ -60,5 +60,8 @@ public class StaticFieldLeakActivity extends AppCompatActivity {
         if (mTextView != null){
             mTextView = null;
         }
+        //华为手机引发的泄漏
+        FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
+        FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
 }
