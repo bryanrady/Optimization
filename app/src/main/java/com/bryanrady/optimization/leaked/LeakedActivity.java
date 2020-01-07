@@ -27,7 +27,7 @@ public class LeakedActivity extends AppCompatActivity {
     }
 
     public void anonymous_inner(View view) {
-        Intent intent = new Intent(this, AnonymousFieldLeakActivity.class);
+        Intent intent = new Intent(this, AnonymousInnerClassLeakActivity.class);
         startActivity(intent);
     }
 }

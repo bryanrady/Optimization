@@ -129,12 +129,10 @@ public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
         }
 
         void study(){
-
-            if(mActivity != null && mActivity.get() != null){
-                NonStaticInnerClassLeakActivity activity = mActivity.get();
+            NonStaticInnerClassLeakActivity activity = mActivity.get();
+            if (activity != null && !activity.isFinishing()){
                 Toast.makeText(activity, "学生在学习",Toast.LENGTH_SHORT).show();
             }
-
         }
 
     }
