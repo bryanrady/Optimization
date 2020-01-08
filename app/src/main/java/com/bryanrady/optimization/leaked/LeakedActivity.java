@@ -41,6 +41,21 @@ public class LeakedActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void resource_not_close(View view) {
+        Intent intent = new Intent(this, ResourceNotCloseLeakActivity.class);
+        startActivity(intent);
+    }
+
+    public void map_set_not_clear(View view) {
+        Intent intent = new Intent(this, MapSetListLeakActivity.class);
+        startActivity(intent);
+    }
+
+    public void webView(View view) {
+        Intent intent = new Intent(this, WebViewLeakActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -48,6 +63,5 @@ public class LeakedActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
-
 
 }

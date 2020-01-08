@@ -49,4 +49,31 @@
         android:layout_marginEnd="20dp"
         android:text="广播、系统服务回调接口、观察者未取消注册监听或回调的造成的内存泄漏" />
 
+    <Button
+        android:onClick="resource_not_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="资源连接未关闭或未正常释放造成的内存泄露" />
+
+    <Button
+        android:onClick="map_set_not_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="集合中对象没清理造成的内存泄漏" />
+
+    <Button
+        android:onClick="webView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="WebView没正确销毁造成的内存泄漏" />
+
 </LinearLayout>

@@ -22,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * https://blog.csdn.net/liu3364575/article/details/80108312
- * https://www.jianshu.com/p/a6658b39e4ff
  * 匿名内部类造成的内存泄漏
  * @author: wangqingbin
  * @date: 2020/1/6 17:01

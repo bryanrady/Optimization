@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.bryanrady.optimization">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -26,6 +28,9 @@
         <activity android:name=".leaked.AnonymousInnerClassLeakActivity"/>
         <activity android:name=".leaked.SingleInstanceLeakActivity"/>
         <activity android:name=".leaked.UnRegisterRemoveLeakActivity"/>
+        <activity android:name=".leaked.ResourceNotCloseLeakActivity"/>
+        <activity android:name=".leaked.MapSetListLeakActivity"/>
+        <activity android:name=".leaked.WebViewLeakActivity"/>
 
     </application>
 
