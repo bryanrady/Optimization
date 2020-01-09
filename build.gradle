@@ -22,6 +22,8 @@ allprojects {
         jcenter()
         //BRVAdapter需要使用到
         maven { url 'https://jitpack.io' }
+
+        mavenCentral()
     }
 }
 

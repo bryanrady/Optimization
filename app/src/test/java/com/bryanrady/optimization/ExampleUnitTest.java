@@ -1,5 +1,7 @@
 package com.bryanrady.optimization;
 
+import android.util.Log;
+
 import org.junit.Test;
 
 import java.lang.ref.PhantomReference;
@@ -21,6 +23,14 @@ public class ExampleUnitTest {
         assertEquals(4, 2 + 2);
     }
 
+    @Test
+    public void testSuffix(){
+        String url = "https://www.baidu.com/img/bd_logo1.png";
+        int index = url.lastIndexOf(".");
+        String suffix = url.substring(index+1);
+        System.out.println("后缀 ：" + suffix);
+        System.out.println("后缀 ：" + suffix.trim());
+    }
 
     @Test
     public void test() throws InterruptedException {
