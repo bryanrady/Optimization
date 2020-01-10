@@ -51,10 +51,8 @@ public class PlayerActivity extends AppCompatActivity {
     private final int IMAGE_FAILED = 2;
     private final int RESOURCE_READY = 3;
     private MyHandler myHandler;
-    //https://blog.csdn.net/zhqw_csdn/article/details/81514313
     private HttpProxyCacheServer proxy;
     private List<String> resources;
-    //多长时间更新一次
     private final int UPDATE_DURATION = 5 * 60 * 1000;
     private Timer timer;
     private UpdateTimerTask timerTask;
@@ -226,10 +224,8 @@ public class PlayerActivity extends AppCompatActivity {
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-
                 index++;
                 switchResource();
-
                 return true;
             }
         });
