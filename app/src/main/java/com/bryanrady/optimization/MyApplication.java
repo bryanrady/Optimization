@@ -3,6 +3,7 @@ package com.bryanrady.optimization;
 import android.app.Application;
 import android.content.Context;
 
+import com.bryanrady.optimization.advertisement.SharePreferenceManager;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -11,7 +12,6 @@ import com.squareup.leakcanary.LeakCanary;
  * @date: 2020/1/3 10:57
  */
 public class MyApplication extends Application {
-
 
     public static MyApplication mContext = null;
     private HttpProxyCacheServer proxy;
@@ -28,6 +28,8 @@ public class MyApplication extends Application {
             return;
         }
         LeakCanary.install(this);
+
+        SharePreferenceManager.init(this,"refreshTime");
     }
 
     public static MyApplication getContext(){
