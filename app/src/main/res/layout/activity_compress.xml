@@ -5,30 +5,40 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="leaked"
+        android:onClick="quality"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="内存泄漏测试" />
+        android:text="质量压缩" />
 
     <Button
-        android:onClick="shake"
+        android:onClick="dimensions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="内存抖动测试" />
+        android:text="尺寸压缩" />
 
     <Button
-        android:onClick="wheel_play"
+        android:onClick="format"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="轮播" />
+        android:text="格式选择" />
+
+    <Button
+        android:onClick="libjpeg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAllCaps="false"
+        android:text="libjpeg-turbo压缩" />
 
 </LinearLayout>

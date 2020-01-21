@@ -1,37 +1,42 @@
-package com.bryanrady.optimization;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.bryanrady.optimization.bitmap;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.advertisement.PlayerActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 import com.bryanrady.optimization.shake.ShakeActivity;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+/**
+ * @author: wangqingbin
+ * @date: 2020/1/20 16:39
+ */
+public class BitmapActivity extends AppCompatActivity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_bitmap);
     }
 
-    public void leaked(View view) {
+    public void compress(View view) {
         Intent intent = new Intent(this, LeakedActivity.class);
         startActivity(intent);
     }
 
-    public void shake(View view) {
+    public void memory(View view) {
         Intent intent = new Intent(this, ShakeActivity.class);
         startActivity(intent);
     }
 
-    public void wheel_play(View view) {
-        Intent intent = new Intent(this, PlayerActivity.class);
+    public void long_bitmap(View view) {
+        Intent intent = new Intent(this, ShakeActivity.class);
         startActivity(intent);
     }
 
@@ -42,6 +47,5 @@ public class MainActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
-
 
 }

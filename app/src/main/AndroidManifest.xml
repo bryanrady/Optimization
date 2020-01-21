@@ -37,6 +37,8 @@
         <activity android:name=".leaked.MapSetListLeakActivity"/>
         <activity android:name=".leaked.WebViewLeakActivity"/>
 
+        <activity android:name=".shake.ShakeActivity"/>
+
     </application>
 
 </manifest>
