@@ -1,0 +1,27 @@
+编译步骤：
+1、下载
+		wget https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.3.tar.gz
+	解压
+		tar xvf 1.5.3.tar.gz
+
+	x86需要(armeabi不用)
+		下载NASM(如果存在不需要下载)
+			wget http://www.nasm.us/pub/nasm/releasebuilds/2.13/nasm-2.13.tar.gz
+		解压
+			tar xvf nasm-2.13.tar.gz
+		编译	
+			cd nasm-2.13
+			./configure 
+			make install
+			
+2、编译
+	进入libjpeg-turbo目录，生成configure
+		cd libjpeg-turbo-1.5.3
+		autoreconf -fiv
+	编译
+		https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/BUILDING.md
+		查看 资料中的 build.sh
+		chmod +x build.sh
+		./build.sh
+	
+		

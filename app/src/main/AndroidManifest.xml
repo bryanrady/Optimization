@@ -25,8 +25,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".advertisement.PlayerActivity"/>
-
         <activity android:name=".leaked.LeakedActivity"/>
         <activity android:name=".leaked.StaticFieldLeakActivity"/>
         <activity android:name=".leaked.NonStaticInnerClassLeakActivity"/>
@@ -38,6 +36,10 @@
         <activity android:name=".leaked.WebViewLeakActivity"/>
 
         <activity android:name=".shake.ShakeActivity"/>
+
+        <activity android:name=".advertisement.PlayerActivity"/>
+
+        <activity android:name=".bitmap.compress.CompressActivity"/>
 
     </application>
 

@@ -1,6 +1,5 @@
 package com.bryanrady.optimization.bitmap.compress;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,8 +8,6 @@ import android.view.View;
 
 import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
-import com.bryanrady.optimization.leaked.LeakedActivity;
-import com.bryanrady.optimization.shake.ShakeActivity;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,21 +21,37 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class CompressActivity extends AppCompatActivity {
 
+    static {
+        System.loadLibrary("bitmap-compress");
+    }
+
     private Bitmap mSrcBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compress);
+        setContentView(R.layout.activity_bitmap_compress);
 
         mSrcBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.lance);
-
-        compress(mSrcBitmap, Bitmap.CompressFormat.PNG, 50, Environment.getExternalStorageState()+"quality_.png");
 
     }
 
     /**
-     * 压缩
+     * 尺寸压缩
+     * @param bitmap
+     * @param width
+     * @param height
+     */
+    private void dimensionCompress(Bitmap bitmap, int width, int height){
+        //filter参数 true 图片滤波处理 色彩更丰富
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+        if (scaledBitmap != null){
+            compress(mSrcBitmap, Bitmap.CompressFormat.PNG, 100,Environment.getExternalStorageState()+"dimension_png.png");
+        }
+    }
+
+    /**
+     * 质量(或者格式)压缩
      * @param bitmap    原图
      * @param compressFormat    压缩格式
      * @param quality
@@ -71,5 +84,34 @@ public class CompressActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
 
+    public void quality(View view) {
+        if (mSrcBitmap != null){
+            //质量压缩 质量减半
+            compress(mSrcBitmap, Bitmap.CompressFormat.PNG, 50, Environment.getExternalStorageState()+"quality_half.png");
+        }
+    }
 
+    public void dimensions(View view) {
+        if (mSrcBitmap != null){
+            //尺寸压缩
+            dimensionCompress(mSrcBitmap, 300,300);
+        }
+    }
+
+    public void format(View view) {
+        //像素格式压缩为PNG
+        compress(mSrcBitmap, Bitmap.CompressFormat.PNG, 100,Environment.getExternalStorageState()+"format_png.png");
+        //像素格式压缩为JPEG
+        compress(mSrcBitmap, Bitmap.CompressFormat.JPEG, 100,Environment.getExternalStorageState()+"format_jpeg.jpeg");
+        //像素格式压缩为WEBP
+        compress(mSrcBitmap, Bitmap.CompressFormat.WEBP, 100,Environment.getExternalStorageState()+"format_webp.webp");
+    }
+
+    public void libjpeg(View view) {
+        if(mSrcBitmap != null){
+            nativeCompress(mSrcBitmap, 100,Environment.getExternalStorageState()+"native_libjpeg.jpeg");
+        }
+    }
+
+    native void nativeCompress(Bitmap bitmap, int quality, String path);
 }

@@ -31,4 +31,13 @@
         android:layout_marginEnd="20dp"
         android:text="轮播" />
 
+    <Button
+        android:onClick="bitmap_compress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="图片压缩" />
+
 </LinearLayout>
