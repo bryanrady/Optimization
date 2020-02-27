@@ -14,12 +14,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.BitmapCompat;
 
 /**
  * @author: wangqingbin
  * @date: 2020/1/20 16:54
  */
-public class CompressActivity extends AppCompatActivity {
+public class FileCompressActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("bitmap-compress");
@@ -114,4 +115,5 @@ public class CompressActivity extends AppCompatActivity {
     }
 
     native void nativeCompress(Bitmap bitmap, int quality, String path);
+
 }

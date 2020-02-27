@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
-import com.bryanrady.optimization.bitmap.compress.CompressActivity;
+import com.bryanrady.optimization.bitmap.compress.FileCompressActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 import com.bryanrady.optimization.shake.ShakeActivity;
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void bitmap_compress(View view) {
-        Intent intent = new Intent(this, CompressActivity.class);
+        Intent intent = new Intent(this, FileCompressActivity.class);
         startActivity(intent);
     }
 

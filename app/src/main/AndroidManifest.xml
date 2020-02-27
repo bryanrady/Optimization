@@ -39,7 +39,7 @@
 
         <activity android:name=".advertisement.PlayerActivity"/>
 
-        <activity android:name=".bitmap.compress.CompressActivity"/>
+        <activity android:name=".bitmap.compress.FileCompressActivity"/>
 
     </application>
 
