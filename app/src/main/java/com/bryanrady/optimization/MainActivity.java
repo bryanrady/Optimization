@@ -7,7 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
-import com.bryanrady.optimization.bitmap.compress.FileCompressActivity;
+import com.bryanrady.optimization.bitmap.compress.file.FileCompressActivity;
+import com.bryanrady.optimization.bitmap.compress.memory.MemoryCompressActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 import com.bryanrady.optimization.shake.ShakeActivity;
@@ -41,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void bitmap_memory(View view) {
+        Intent intent = new Intent(this, MemoryCompressActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -48,5 +54,6 @@ public class MainActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
+
 
 }

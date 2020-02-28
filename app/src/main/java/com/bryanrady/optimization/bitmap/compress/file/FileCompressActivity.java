@@ -1,4 +1,4 @@
-package com.bryanrady.optimization.bitmap.compress;
+package com.bryanrady.optimization.bitmap.compress.file;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.BitmapCompat;
 
 /**
  * @author: wangqingbin
@@ -31,7 +30,7 @@ public class FileCompressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bitmap_compress);
+        setContentView(R.layout.activity_bitmap_file_compress);
 
         mSrcBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.lance);
 
