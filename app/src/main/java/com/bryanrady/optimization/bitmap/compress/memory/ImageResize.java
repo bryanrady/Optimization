@@ -44,6 +44,13 @@ public class ImageResize {
         if (!hasAlpha){
             options.inPreferredConfig = Bitmap.Config.RGB_565;
         }
+
+        /**
+         * 图片复用
+         */
+        //设置异变
+        options.inMutable = true;
+
         //返回缩放后的图片
         return BitmapFactory.decodeResource(context.getResources(), resourceId, options);
     }
