@@ -1,8 +1,11 @@
 package com.bryanrady.optimization.bitmap.compress.memory;
 
+import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -11,6 +14,10 @@ import com.bryanrady.optimization.leaked.FixLeakedUtils;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /**
  * @author: wangqingbin
@@ -25,7 +32,19 @@ public class MemoryCompressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bitmap_memory_compress);
 
-        ImageCache.getInstance().init(this,"");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//如果 API level 是大于等于 23(Android 6.0) 时
+            //判断是否具有权限
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE},
+                        0);
+            }
+        }
+
+        //9.0的文件有问题，但是流程测试了一遍基本没问题
+        ImageCache.getInstance().init(this, Environment.getExternalStorageDirectory()+"/imageCache");
 
         ListView listView = findViewById(R.id.listView);
         listView.setAdapter(new MyAdapter(this));

@@ -29,11 +29,12 @@ public class ImageResize {
         options.inJustDecodeBounds = true;
         //加载图片，这时候图片并没有真正加载到内存当中，我们只是解析出图片的原始信息而已
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-        if (bitmap != null){
-            Log.d("wangqingbin","bitmap=="+bitmap.getByteCount());
-        }else{
-            Log.d("wangqingbin","bitmap null");
-        }
+        //这里每次都是打印的null
+//        if (bitmap != null){
+//            Log.e("wangqingbin","bitmap=="+bitmap.getByteCount());
+//        }else{
+//            Log.e("wangqingbin","bitmap null");
+//        }
         //获取到原图的宽高
         int width = options.outWidth;
         int height = options.outHeight;
@@ -50,6 +51,8 @@ public class ImageResize {
          */
         //设置异变
         options.inMutable = true;
+        options.inBitmap = reusable;
+        Log.d("wangqingbin","服务器加载使用复用内存:" + reusable);
 
         //返回缩放后的图片
         return BitmapFactory.decodeResource(context.getResources(), resourceId, options);

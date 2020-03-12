@@ -6,8 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Process;
+import android.util.Log;
 import android.util.LruCache;
 
+import com.bryanrady.optimization.BuildConfig;
+import com.bryanrady.optimization.bitmap.compress.memory.disk.DiskLruCache;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -51,6 +59,8 @@ public class ImageCache {
     private ReferenceQueue<Bitmap> mReferenceQueue;
     //线程    目的是为了从引用队列中取出数据然后进行释放
     Thread mClearReferenceQueueThread;
+    //一级磁盘缓存 也是通过lru算法实现 杰克.沃顿大神的
+    private DiskLruCache mDiskLruCache;
 
     /**
      * 做一个全局的获取
@@ -95,7 +105,10 @@ public class ImageCache {
         if (am != null){
             //获取程序可用的最大内存
             int largeMemoryClass = am.getLargeMemoryClass();
-            mMemoryCache = new LruCache<String, Bitmap>(largeMemoryClass / 8 * 1204 * 1024) {
+            //largeMemoryClass / 8 * 1024 * 1024
+            //我们这里为了测试复用池不申请这么大的缓存，防止缓存空间太大导致复用池中一直没数据，我们这里设置小一点
+            //19404打印得知一张bitmap的内存大小大概是这么多，这里我们缓存10张
+            mMemoryCache = new LruCache<String, Bitmap>(19404 * 10) {
 
                 /**
                  * 返回value所占用的内存大小
@@ -105,6 +118,9 @@ public class ImageCache {
                  */
                 @Override
                 protected int sizeOf(String key, Bitmap value) {
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT){
+                        return value.getAllocationByteCount();
+                    }
                     return value.getByteCount();
                 }
 
@@ -124,6 +140,7 @@ public class ImageCache {
                      */
                     //如果图片是异变的，我们把图片添加到复用池中
                     if (oldValue.isMutable()){
+                        Log.e("wangqingbin","加入复用池:" + oldValue);
                         putBitmap2ReusablePool(oldValue);
                     }else{
                         if (!oldValue.isRecycled()){
@@ -133,6 +150,78 @@ public class ImageCache {
                 }
             };
         }
+
+        try {
+            //valueCount: 表示一个key对应valueCount个文件
+            mDiskLruCache = DiskLruCache.open(new File(dir), BuildConfig.VERSION_CODE,
+                    1, 10 * 1024 * 1024);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void putBitmap2DiskCache(String key, Bitmap bitmap){
+        DiskLruCache.Snapshot snapshot = null;
+        OutputStream os = null;
+        try {
+            if (mDiskLruCache != null){
+                snapshot = mDiskLruCache.get(key);
+                if (snapshot == null){
+                    DiskLruCache.Editor editor = mDiskLruCache.edit(key);
+                    if (editor != null){
+                        os = editor.newOutputStream(0);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG,50, os);
+                        editor.commit();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (snapshot != null){
+                snapshot.close();
+            }
+            if (os != null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public Bitmap getBitmapFromDiskCache(String key,Bitmap reusable){
+        DiskLruCache.Snapshot snapshot = null;
+        try {
+            if (mDiskLruCache != null){
+                snapshot = mDiskLruCache.get(key);
+                if (snapshot == null){
+                    return null;
+                }
+                //获得文件输入流 读取bitmap
+                InputStream is = snapshot.getInputStream(0);
+
+                //从磁盘加载的时候，我们也让它能够被复用内存
+                mOptions.inMutable = true;
+                mOptions.inBitmap = reusable;
+                Log.d("wangqingbin","磁盘加载使用复用内存:" + reusable);
+                Bitmap bitmap = BitmapFactory.decodeStream(is,null, mOptions);
+                if (bitmap != null){
+                    putBitmap2MemoryCache(key,bitmap);
+                }
+                return bitmap;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //这里面关闭也会把InputStream关闭掉，所以我们这里就不用关闭is了
+            if (snapshot != null){
+                snapshot.close();
+            }
+        }
+        return null;
     }
 
     public void putBitmap2MemoryCache(String key, Bitmap bitmap){
@@ -175,6 +264,7 @@ public class ImageCache {
                 //可以被复用
                 if (checkInBitmap(bitmap, width, height, inSampleSize)){
                     reusable = bitmap;
+                    Log.d("wangqingbin","找到了可以被复用内存的图片");
                     //移出复用池
                     iterator.remove();
                     break;
@@ -223,7 +313,11 @@ public class ImageCache {
                 width /= inSampleSize;
                 height /= inSampleSize;
             }
+            Log.d("wangqingbin","bitmap.getWidth()=="+bitmap.getWidth());
+            Log.d("wangqingbin","bitmap.getHeight()=="+bitmap.getHeight());
             int byteCount = width * height * getPixelsCount(bitmap.getConfig());
+            Log.d("wangqingbin","byteCount=="+byteCount);
+            Log.d("wangqingbin","bitmap.getAllocationByteCount()=="+bitmap.getAllocationByteCount());
             return byteCount <= bitmap.getAllocationByteCount();
         }
     }
