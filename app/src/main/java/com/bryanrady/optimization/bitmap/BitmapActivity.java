@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.R;
-import com.bryanrady.optimization.advertisement.PlayerActivity;
+import com.bryanrady.optimization.bitmap.compress.file.FileCompressActivity;
+import com.bryanrady.optimization.bitmap.large.LargeBitmapActivity;
+import com.bryanrady.optimization.bitmap.compress.memory.MemoryCompressActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
-import com.bryanrady.optimization.leaked.LeakedActivity;
-import com.bryanrady.optimization.shake.ShakeActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,18 +25,18 @@ public class BitmapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bitmap);
     }
 
-    public void compress(View view) {
-        Intent intent = new Intent(this, LeakedActivity.class);
+    public void bitmap_compress(View view) {
+        Intent intent = new Intent(this, FileCompressActivity.class);
         startActivity(intent);
     }
 
-    public void memory(View view) {
-        Intent intent = new Intent(this, ShakeActivity.class);
+    public void bitmap_memory(View view) {
+        Intent intent = new Intent(this, MemoryCompressActivity.class);
         startActivity(intent);
     }
 
-    public void long_bitmap(View view) {
-        Intent intent = new Intent(this, ShakeActivity.class);
+    public void bitmap_large(View view) {
+        Intent intent = new Intent(this, LargeBitmapActivity.class);
         startActivity(intent);
     }
 

@@ -41,6 +41,7 @@
 
         <activity android:name=".bitmap.compress.file.FileCompressActivity"/>
         <activity android:name=".bitmap.compress.memory.MemoryCompressActivity"/>
+        <activity android:name=".bitmap.large.LargeBitmapActivity"/>
 
     </application>
 

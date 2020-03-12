@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="compress"
+        android:onClick="bitmap_compress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -14,7 +14,7 @@
         android:text="图片压缩" />
 
     <Button
-        android:onClick="memory"
+        android:onClick="bitmap_memory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -23,12 +23,12 @@
         android:text="内存管理" />
 
     <Button
-        android:onClick="long_bitmap"
+        android:onClick="bitmap_large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="长图加载" />
+        android:text="巨图加载" />
 
 </LinearLayout>
