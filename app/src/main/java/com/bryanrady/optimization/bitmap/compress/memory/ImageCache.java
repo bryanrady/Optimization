@@ -118,6 +118,7 @@ public class ImageCache {
                  */
                 @Override
                 protected int sizeOf(String key, Bitmap value) {
+                    //这里考虑到图片的复用，所以返回被复用图片申请的内存，而不是新图片真实的内存
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT){
                         return value.getAllocationByteCount();
                     }

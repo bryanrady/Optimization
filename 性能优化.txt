@@ -725,15 +725,149 @@
 
         3.1 Bitmap在加载时内存大小计算
 
-            Bitmap.Config.ARGB_8888：即argb各占8位，1个字节8位，即4个字节
+            Bitmap.Config.ARGB_8888：即argb各占8位，总共32位，1个字节8位，即4个字节
 
                 memorySize = width * height * 4
 
-            Bitmap.Config.RGB_565：没有alpha通道，r占5位，g占6位，b占5位，即4个字节
+            Bitmap.Config.RGB_565：没有alpha通道，r占5位，g占6位，b占5位，总共16位，即2个字节
 
                 memorySize = width * height * 2
 
-        3.2 压缩
+
+            getAllocationByteCount()和getByteCount()的区别
+
+            getByteCount()           是bitmap实际占的内存。
+
+            getAllocationByteCount() 考虑到内存的复用，如果B复用了A的内存，返回的内存大小就是A的内存大小。
+
+        3.2 内存压缩(采样率压缩)
+
+            为什么叫采样率压缩？
+
+                我们通过控制解码图片参数BitmapFactory.Options来控制解码出来的东西，通过设置options的参数inJustDecodeBounds
+                来控制解码出来的图片信息，inJustDecodeBounds设置为true,这时候图片并没有真正加载到内存当中,而只是解码出图片
+                的一些边界信息，也就是outXXX参数。通过outXXX参数我们可以获取到图片的宽高，这个过程就是采样的过程。
+
+            压缩过程
+
+                得到图片的宽高后我们可以动态的对图片进行缩放，缩放系数(采样率)就是通过宽高等信息来进行计算，然后通过设置
+                inSampleSize参数来设置采样率，然后inJustDecodeBounds设置为false，表示解码出图片的所有信息，然后通过设置
+                options参数来加载压缩后的图片。
+
+            BitmapFactory.Options（控制解码图片参数）的一些常用参数
+
+                inDensity           表示这个bitmap的像素密度，根据drawable目录
+
+                inTargetDensity     表示要被画出来时到目标(屏幕)的像素密度
+
+                inJustDecodeBounds  控制解码图片的边界信息 读取图片out…系列参数,如outWidth与outHeight，可用于计算内存大小
+
+                inPreferredConfig   设置图片解码后的像素格式,如ARGB_8888/RGB_565
+
+                inSampleSize        设置图片解码缩放比,如值为4，则加载图片宽高是原图的1/4,内存大小则是1/16
+
+                inMutable           异变
+
+                inBitmap            图片复用
+
+            总结
+
+                对于内存的降低，无论是选择jpg还是png更或者是webp。其实都是毫无意义的。Jpg是属于有损压缩，我们看见的jpg比png文件小，
+                那是因为压缩率高。这都是属于文件存储范畴。对于内存来说，我们加载一张不带alpha通道使用RGB_565格式的png与一张jpg占用
+                的内存大小都是一样的。对于内存的压缩我们能做的就是缩小图片尺寸与改变像素格式。
+
+
+            图片缓存    内存缓存 + 磁盘缓存实现基本的图片缓存
+
+                LruCache
+
+                    android提供的一个缓存工具类，使用LRU缓存淘汰算法。根据数据的历史访问记录来进行淘汰数据，“如果数据最近被访问过，
+                    那么将来被访问的几率也更高”。
+
+                Lru算法基本原理
+
+                    内部实现通过LinkedHashMap来实现，LinkedHashMap具体实现请研究数据结构。
+
+                    (1)新数据插入到链表头部
+
+                    (2)每当缓存命中（即缓存数据被访问），则将数据移到链表头部
+
+                    (3)当链表满的时候，将链表尾部的数据丢弃
+
+                内存缓存
+
+                    内存缓存是通过LruCache来实现，里面有两个我们经常用到的方法
+
+                    返回Bitmap所占用的内存大小
+                        protected int sizeOf(String key, Bitmap value);
+
+                    当Bitmap从LruCache中移除时回调，oldValue就是被移除的Bitmap
+                        protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue);
+
+                磁盘缓存
+
+                    DiskLruCache    用的是杰克沃顿大神写的，内部也是通过Lru算法来实现
+
+                        https://github.com/JakeWharton/DiskLruCache
+
+
+            图片内存复用
+
+                图片内存复用就是在加载新图片的时候，可以使用之前以及加载过的图片的内存来作为新图片的内存，这样就不用再为新图片
+                申请新的内存空间了。通过设置options.inBitmap参数来实现复用内存。
+
+                但是复用内存有一些限制，可被复用内存的Bitmap必须具备以下条件才可被复用:
+
+                    1. 可被复用的Bitmap必须设置inMutable为true（设置异变）
+
+                    2. 4.4(API 19)之前
+
+                            只有格式为jpg、png，并且待分配内存的Bitmap的宽高与被复用的Bitmap(从复用池中取出来的)的宽高必须一致，
+                            并且inSampleSize为1的Bitmap才可被复用。并且被复用的Bitmap的inPreferredConfig会覆盖待分配内存的Bitmap
+                            设置的inPreferredConfig；
+
+                       4.4(API 19)之后
+
+                            被复用的Bitmap的内存必须大于等于待分配内存的Bitmap的内存；
+
+
+            Bitmap内存管理
+
+                https://developer.android.google.cn/topic/performance/graphics/manage-memory.html
+
+
+            通过列表显示1000张或者更多的图片，这就意味着要加载1000图片，我们改如何优化？
+
+                分析
+
+                    1.加载图片我们首先考虑到的肯定是内存开销，这么多张图片一起使用如果我们内存管理不当可能会造成OOM。
+                      我们可以通过内存压缩和内存复用来减小内存压力。
+
+                    2.而且这么多图片我们每次都从服务器上下载那肯定是不太好的，我们可以用缓存来进行优化。
+
+                加载流程
+
+                    每次加载图片我们首先从内存缓存中取，如果内存缓存没有，我们就从磁盘缓存中取，再从磁盘缓存中取之前，我们先从
+                    复用池中查找时候是否有符合要求的图片，有的话我们就使用复用池图片的内存来加载新的图片，如果磁盘缓存中没有的话，
+                    我们就从服务器上下载新的图片(从磁盘读取的)，在加载之前先压缩，然后还是从复用池中查找时候是否有符合要求的图片，
+                    有的话我们就使用复用池图片的内存来加载新的图片(从服务器下载的)，没有的话就是申请新的内存，然后把新图片放进
+                     内存缓存和磁盘缓存中，大概流程就是这样，这样就达到了一定的优化效果。
+
+                具体实现
+
+                    1.首先从网络上加载图片，在加载的时候我们对图片进行压缩，目的是为了减小图片内存大小，然后每加载一张图片，
+                      我们就把刚加载的图片添加到内存缓存和磁盘缓存当中。这样我们下次取的时候就直接从缓存中取。
+
+                    2.为了更一步减少内存，我们可以使用图片复用。我们创建一个Set集合也就是复用池，当Lru算法把Bitmap从LruCache
+                      中移除的时候我们就可以把被移除的Bitmap的弱引用添加进复用池，为什么要使用弱引用，因为弱引用当GC扫过之后，
+                      就会把这个Bitmap放进引用队列中，我们从引用队列中就可以找到被回收了的Bitmap。我们在加载新图片的时候就可以
+                      从引用队列中取出可以被复用内存的Bitmap来实现图片内存复用。
+
+
+
+
+
+
 
 
 

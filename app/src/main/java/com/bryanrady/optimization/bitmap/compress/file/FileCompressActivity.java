@@ -113,6 +113,12 @@ public class FileCompressActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 微信压缩就是采样的这种 哈夫曼编码的压缩方式
+     * @param bitmap
+     * @param quality
+     * @param path
+     */
     native void nativeCompress(Bitmap bitmap, int quality, String path);
 
 }

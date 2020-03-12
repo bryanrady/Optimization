@@ -7,7 +7,7 @@ void write_JPEG_file(uint8_t *temp, uint32_t w, uint32_t h, jint quality, const 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_bryanrady_optimization_bitmap_compress_FileCompressActivity_nativeCompress(JNIEnv *env,
+Java_com_bryanrady_optimization_bitmap_compress_file_FileCompressActivity_nativeCompress(JNIEnv *env,
                                                                                 jobject instance,
                                                                                 jobject bitmap,
                                                                                 jint quality,
