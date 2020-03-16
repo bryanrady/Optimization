@@ -21,9 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class FileCompressActivity extends AppCompatActivity {
 
-    static {
-        System.loadLibrary("bitmap-compress");
-    }
+//    static {
+//        System.loadLibrary("bitmap-compress");
+//    }
 
     private Bitmap mSrcBitmap;
 

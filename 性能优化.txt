@@ -639,7 +639,7 @@
            （2）String拼接创建大量小的字符串对象造成的内存抖动，如频繁的日志拼接打印。
 
 
-三、图片压缩
+三、图片压缩和Bitmap内存管理
 
     1. 图片压缩有两种方式： 文件压缩、 内存压缩。
 
@@ -864,6 +864,37 @@
                       从引用队列中取出可以被复用内存的Bitmap来实现图片内存复用。
 
     4. 巨图加载
+
+        BitmapRegionDecoder 图片的局部解析
+
+        内部主要方法
+
+            //获取区域解码器对象   isShareable： 共享数据 false代表解码器会拷贝一份数据 这样即使is被关闭了 也不会造成影响
+            public static BitmapRegionDecoder newInstance(InputStream is, boolean isShareable) throws IOException
+
+            public static BitmapRegionDecoder newInstance(String pathName, boolean isShareable) throws IOException
+
+            //根据Rect和Options来加载指定区域的Bitmap
+            public Bitmap decodeRegion(Rect rect, BitmapFactory.Options options)
+
+        巨图加载主要思想
+
+            对我们来说巨图就是超大的图片，可能是横长图也可能是竖长图，就是非常宽和非常高的图片。这里我们针对竖长图来进行说明，
+            竖长图指的就是图片高度是图片宽度几倍甚至十几倍的图片。这类图片如果我们直接加载进内存的话，由于图片分辨率过大加载
+            进来的内存也比较大可能就会导致OOM，这是我们不想看到的，所以我们可以尝试加载指定区域的图片,并且通过Bitmap内存复用
+            来复用上一次加载Bitmap的内存来减少内存压力。
+
+            (1) 使用自定义View来作为加载长图的控件，根据图片源通过BitmapFactory.Options来解码出图片原始信息(宽高等)，然后设置
+                Bitmap内存复用和格式来减少加载图片时的内存，并构建区域解码器对象用于解码指定区域的图片,然后调用requestLayout()
+                来请求布局，这样就会走进测量流程。
+
+            (2) 我们可以在onMeasure()方法中获取到View的宽高，然后通过Rect来指定要加载的图片区域，根据图片宽度和View的宽度来指定
+                图片缩放因子，竖长图
+
+
+
+
+
 
 
 
