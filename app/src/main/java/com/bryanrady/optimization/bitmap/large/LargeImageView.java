@@ -75,7 +75,7 @@ public class LargeImageView extends View implements GestureDetector.OnGestureLis
         BitmapFactory.decodeStream(is,null, mOptions);
         mImageWidth = mOptions.outWidth;
         mImageHeight = mOptions.outHeight;
-        //设置异变 为了复用
+        //如果为true， 那么该bitmap缓存区可以被修改，否则不可被修改
         mOptions.inMutable = true;
         //设置成565节省点内存
         mOptions.inPreferredConfig = Bitmap.Config.RGB_565;

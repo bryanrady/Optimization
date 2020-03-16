@@ -766,7 +766,7 @@
 
                 inSampleSize        设置图片解码缩放比,如值为4，则加载图片宽高是原图的1/4,内存大小则是1/16
 
-                inMutable           异变
+                inMutable           易变
 
                 inBitmap            图片复用
 
@@ -818,7 +818,7 @@
 
                 但是复用内存有一些限制，可被复用内存的Bitmap必须具备以下条件才可被复用:
 
-                    1. 可被复用的Bitmap必须设置inMutable为true（设置异变）
+                    1. 可被复用的Bitmap必须设置inMutable为true（设置易变）
 
                     2. 4.4(API 19)之前
 

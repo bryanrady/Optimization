@@ -49,7 +49,7 @@ public class ImageResize {
         /**
          * 图片复用
          */
-        //设置异变
+        //设置可变
         options.inMutable = true;
         options.inBitmap = reusable;
         Log.d("wangqingbin","服务器加载使用复用内存:" + reusable);

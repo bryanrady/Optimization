@@ -139,7 +139,7 @@ public class ImageCache {
                      *  3.0及3.0以上  Bitmap 内存在 java
                      *  8.0           Bitmap 内存在 native
                      */
-                    //如果图片是异变的，我们把图片添加到复用池中
+                    //如果图片是可变的，我们把图片添加到复用池中
                     if (oldValue.isMutable()){
                         Log.e("wangqingbin","加入复用池:" + oldValue);
                         putBitmap2ReusablePool(oldValue);
