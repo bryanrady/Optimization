@@ -898,10 +898,130 @@
                 手势滑动和触摸来确定接下来要加载的图片区域。
 
             (4) 通过手势GestureDetector和滑动帮助类Scroller来进行滑动，并且要设置View的触摸事件，然后把屏幕的触摸事件交给手势来
-                进行处理，然后处理手势的事件即可。最主要的两个回调方法onScroll()和onFling()方法，分别代表手指的拖拽过程和手指离开
-                屏幕后的惯性滑动过程。在这两个过程中根据手值的滑动区域和惯性滑动区域来动态的确定图片的加载区域即可。
+                进行处理，然后处理手势的事件即可。最主要的两个回调方法onScroll()和onFling()方法，分别代表手指的拖拽过程和手指离
+                开屏幕后的惯性滑动过程。在这两个过程中根据手值的滑动区域和惯性滑动区域来动态的确定图片的加载区域即可。
 
 
+四、耗电测试和电量优化
+
+    1.耗电量
+
+        手机各个硬件模块的耗电量是不一样的，有些模块非常耗电比如移动蜂窝网络、GPS，而有些模块则相对显得耗电量小很多。一般来说耗
+        电量和我们要实现的功能总是很矛盾，比如说产品经理有时候需要每隔一段时间上报gps信息，这样我们的开发的应用就感觉会非常耗电。
+
+    2.耗电测试
+
+        电量测试，就是测试移动设备电量消耗快慢的一种测试方法。一般用平均电流来衡量电量消耗速度。平均电流越小，说明设备使用时间越
+        长。但是平均电流多大才说明不耗电却没有一个统一标准。
+
+        (1)硬件测试
+
+            利用硬件设备测试被测设备的电流，统计一段时间内(使用某个功能模块)的平均电流值。
+
+        (2)软件测试
+
+            利用系统工具导出分析报告，Battery Historian是google开源的电池历史数据分析工具。
+
+            https://github.com/google/battery-historian
+
+            Bugreport   导出分析数据
+
+            对于SDK25开始 bugreport 必须在7.0以上设备才能使用。
+
+            下载旧版本: http://mirrors.zzu.edu.cn/android/repository/
+            如：下载r20的platform-tools
+
+            下载安装好了之后，然后来进行测试，步骤如下:
+
+            重置
+            	adb shell dumpsys batterystats --reset
+
+            获取完整的wakelock信息
+            	adb shell dumpsys batterystats --enable full-wake-history
+
+            拔掉USB（让设备不处于充电状态），等待一段时间
+
+            获得报告:
+            	>7.0
+            	adb bugreport bugreport.zip
+
+            	<=6.0
+            	adb bugreport > bugreport.txt
+
+
+            WakeLock级别：
+
+                PARTIAL_WAKE_LOCK       保证CPU保持高性能运行，而屏幕和键盘背光（也可能是触摸按键的背光）关闭。一般情况下都
+                                        会使用这个WakeLock。
+
+                ACQUIRE_CAUSES_WAKEUP   这个WakeLock除了会使CPU高性能运行外还会导致屏幕亮起，即使屏幕原先处于关闭的状态下。
+
+                ON_AFTER_RELEASE        如果释放WakeLock的时候屏幕处于亮着的状态，则在释放WakeLock之后让屏幕再保持亮一小会。
+                                        如果释放WakeLock的时候屏幕本身就没亮，则不会有动作。
+
+                API17后被弃用的WakeLock：保持屏幕长亮
+
+                SCREEN_DIM_WAKE_LOCK：保证屏幕亮起，但是亮度可能比较低。同时键盘背光也可以不亮。
+
+                SCREEN_BRIGHT_WAKE_LOCK ：保证屏幕全亮，同时键盘背光也亮。
+
+                FULL_WAKE_LOCK：表现和SCREEN_BRIGHT_WAKE_LOCK 类似，但是区别在于这个等级的WakeLock使用的是最高亮度！
+
+                推荐是用WindowFlagWindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON。
+
+                使用方法是：
+
+                    在Activity中： getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                    在布局中添加这个属性：android:keepScreenOn="true"
+
+
+    3.优化建议
+
+        后台处理三个原则：
+        	(1)减少；我们需要减少后台处理
+        	(2)延迟；当设备充电时候再去执行
+        	(3)合并；把多个处理任务合并在一起。
+
+        	1、注意wakelock,根据情况可以使用Jobscheduler/Alarm替代
+            2、及时关闭不再需要的功能，如GPS、网络请求超时设置
+            3、在使用wifi/充电状态下执行某些任务 JobScheduler、主动/被动获取状态
+
+        Doze
+
+            https://developer.android.google.cn/training/monitoring-device-state/doze-standby.html?hl=zh-cn
+
+            进入条件
+            	设备未插接电源
+            	处于静止状态一段时间
+            	屏幕关闭
+
+        Standby
+
+            未主动使用应用、一段时间未触摸应用进入
+
+            以下情况不会进入：
+        	    用户显式启动应用。
+        	    应用当前有一个进程位于前台（表现为 Activity 或前台服务形式，或被另一 Activity 或前台服务占用）。
+        	    应用生成用户可在锁屏或通知托盘中看到的通知。
+
+        	通过运行以下命令强制应用进入应用待机模式：
+                adb shell dumpsys battery unplug
+                adb shell am set-inactive <packageName> true
+
+            使用以下命令模拟唤醒应用：
+                adb shell am set-inactive <packageName> false
+                adb shell am get-inactive <packageName>
+
+        白名单
+
+            强制系统在低电耗模式之间循环切换：
+            adb shell dumpsys battery unplug
+            adb shell dumpsys deviceidle step
+
+            <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+            public
 
 
 
