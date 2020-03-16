@@ -70,6 +70,7 @@ public class LargeImageView extends View implements GestureDetector.OnGestureLis
     }
 
     public void setImage(InputStream is){
+        //先读取原图的宽高
         mOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(is,null, mOptions);
         mImageWidth = mOptions.outWidth;
@@ -103,18 +104,19 @@ public class LargeImageView extends View implements GestureDetector.OnGestureLis
         }
         mViewWidth = getMeasuredWidth();
         mViewHeight = getMeasuredHeight();
-        //设置要加载的图片矩形区域
-        mRect.left = 0;
-        mRect.top = 0;
+
         /**
-         * 根据图片宽来计算缩放因子  所以计算横长图的话会有问题，这里只针对竖长图
+         * 设置要加载的图片矩形区域 根据图片宽来计算缩放因子  所以计算横长图的话会有问题，这里只针对竖长图
          * 但是知晓竖长图加载原理后，横长图也是没问题的
          */
-        mScale = (float)(mViewWidth / mImageWidth);
+        mRect.left = 0;
+        mRect.top = 0;
+        //这里要加载图片的宽度 然后再进行缩放
         mRect.right = mImageWidth;
-        // 需要加载的高(屏幕高) * 缩放因子 = 视图view的高
+        mScale = (float)(mViewWidth / mImageWidth);
+        // 一次需要加载的高 * 缩放因子 = 视图view的高
+        // w * mScale = mViewWidth;
         // h * mScale = mViewHeight
-        //(mViewHeight / mScale) 就是一个屏幕的高
         mRect.bottom = (int)(mViewHeight / mScale);
 
         Log.d("wangqingbin","mViewWidth=="+mViewWidth);
@@ -156,7 +158,7 @@ public class LargeImageView extends View implements GestureDetector.OnGestureLis
         if (!mScroller.isFinished()){
             mScroller.forceFinished(true);
         }
-        //这里让它返回true 才能继续接收后续事件
+        //这里让它返回true 这样才能继续接收后续事件
         return true;
     }
 
