@@ -68,6 +68,9 @@
 
         <activity android:name=".battery.BatteryActivity"/>
 
+        <activity android:name=".thread.ThreadActivity"/>
+        <activity android:name=".thread.pcmode.ProducerConsumerActivity"/>
+
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="94faec238fc0e5b1e961ffbb24970844">

@@ -12,6 +12,7 @@ import com.bryanrady.optimization.bitmap.BitmapActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 import com.bryanrady.optimization.shake.ShakeActivity;
+import com.bryanrady.optimization.thread.ThreadActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void thread(View view) {
+        Intent intent = new Intent(this, ThreadActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onDestroy() {
