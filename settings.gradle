@@ -1,2 +1,2 @@
-include ':app', ':producerconsumer'
+include ':app', ':thread'
 rootProject.name='Optimization'

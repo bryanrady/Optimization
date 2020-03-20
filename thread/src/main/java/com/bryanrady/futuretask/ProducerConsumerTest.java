@@ -1,6 +1,7 @@
-package com.bryanrady.producerconsumer;
+package com.bryanrady.futuretask;
 
 /**
+ * 生产消费模式
  * @author: wangqingbin
  * @date: 2020/3/19 14:51
  */
