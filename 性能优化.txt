@@ -1021,22 +1021,286 @@
 
             <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
-            public
+                public static void addDozeWhite(Activity activity){
+                    PowerManager powerManager = (PowerManager) activity.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        //如果不是白名单
+                        if(!powerManager.isIgnoringBatteryOptimizations(activity.getPackageName())){
+                            //方法1：跳转白名单界面
+            //                Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            //                activity.startActivity(intent);
+
+                            //方法2: (需要权限)弹出对话框
+                            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                            intent.setData(Uri.parse("package:" + activity.getPackageName()));
+                            activity.startActivity(intent);
+                        }
+                    }
+                }
 
 
+五、多线程
+
+    1. 进程
+
+        进程是系统进行资源分配和调度的独立单位。每一个进程都有它独立的内存空间和系统资源。
+
+    2. 线程
+
+        2.1 线程的定义
+
+            线程是进程中可独立执行的最小单位。一个进程可包含多个线程。
+
+        2.2 线程的创建
+
+            (1) 创建一个类继承Thread类，重写run()
+
+            (2) 创建一个类实现Runnable接口，实现run()
+
+        2.3 run()和start()的区别？
+
+            run()      仅仅是封装被线程执行的代码，直接调用是普通方法
+
+            start()    启动线程，然后由jvm去调用该线程的run()方法
+
+        2.4 两种创建线程的方式那种更好？
+
+            一般我们使用实现Runnable接口，原因:
+
+                (1) 实现Runnable接口可以避免java单继承的限制。
+
+                (2) Runnable是一个任务，我们应该将运行任务和运行机制进行解耦
+
+    3. Thread类的几个重要方法
+
+        3.1 sleep(long millis)
+
+            public static native void sleep(long millis) throws InterruptedException;
+
+            sleep()是Thread类的一个静态native方法，使当前线程进入睡眠状态。
+
+        3.2 join()/join(long millis)
+
+            public final void join() throws InterruptedException
+
+            join()是Thread类中的一个成员方法，使当前线程进入阻塞状态。如果线程调用了这句话，就是必须等到当前线程执行
+            完成后才可以执行后续代码。join()实际上是调用了join(0)。
+
+        3.3 interrupt()
+
+            public void interrupt()
+
+            interrupt()Thread类里面的一个普通方法，中断线程，内部实际上真正的打断还是调用了native的interrupt0()方法。
+
+        3.4 yield()
+
+            public static native void yield();
+
+            yield()是Thread类的一个静态native方法，线程让步，让当前线程释放CPU资源，让其他线程抢占，线程的让步操作比不让步耗时长。
+
+        3.5 isAlive()
+
+            public final native boolean isAlive();
+
+            isAlive()是Thread类的一个静态native方法，判断当前线程是否处于存活状态
+
+        3.6 isInterrupted()
+
+            public boolean isInterrupted()
+
+            isInterrupted()Thread类里面的一个普通方法，判断当前线程是否已经中断，内部实际上是调用了native的isInterrupted()方法。
 
 
+    4. 线程的安全问题
+
+        在多线程的环境下，一般会用多个线程执行相同的代码，如果在这份相同的代码里存在着共享变量或者一些组合操作的时候，可能就会出现问题。
 
 
+        4.1 原子性
+
+            (1)原子性定义
+
+                原子性是世界上最小单位，具有不可分割性。不论是多核还是单核，具有原子性的量，同一时刻只能有一个线程来对它进行操作。
+                简而言之，在整个操作过程中不会被线程调度器中断的操作，都可认为是原子性。非原子性也就是整个过程中会出现线程调度器
+                中断操作的现象。
+
+                比如 a = 0; 这个操作是不可分割的，那我们就说这个操作是原子操作。一个操作是原子操作，那么我们就称它具有原子性。
+
+                而 int a = 0;可分割为int a; a = 0。 a++,先取出a的值，然后再计算a + 1，然后再给a赋值，这个操作历经3步，是可分割
+                的，所以它不是一个原子操作，就不具有原子性。
+
+            (2)原子性的应用
+
+                非原子操作都会存在线程安全问题，需要我们使用同步技术（synchronized）来让它变成一个原子操作。一个操作是原子操作，
+                那么我们就称它具有原子性。
+
+                JDK中有atomic包提供给我们实现原子性操作。
 
 
+        4.2 可见性
+
+            一个线程对共享变量值的修改，能够及时的被其它线程看到。在多线程的情况下，共享变量不一定是可见的。要想实现变量的一定可见，
+            可以使用synchronized、volatile两种方式(其实还有final，但是它初始化后，值不可更改，所以一般不用它实现可见性)。
+
+        4.3 volatile关键字
+
+            volatile是一种轻量级的同步机制，volatile仅仅用来保证该变量对所有线程的可见性，但不保证原子性。
+
+                (1)保证该变量对所有线程的可见性
+
+                    在多线程的环境下，当共享变量被修改了，所有的线程都能知道这个变量被修改了，这就是可见性。
+
+                (2)不保证原子性
+
+                    修改变量(赋值)实质上是在jvm中分了好几步，而在这几步内(从装载变量到修改)，它是不安全的。
 
 
+            使用了volatile修饰的变量保证了三点：
+
+                (1)一旦共享变量发生被其它线程进行修改，任何访问这个共享变量的线程都能得到最新的值。
+
+                (2)volatile可以防止指令重排序。
 
 
+            一般来说，volatile大多用于标志位上(判断操作),满足下面的条件才应该使用volatile修饰变量：
+
+                (1)修改变量时不依赖变量的当前值(因为volatile是不保证原子性的)
+
+                (2)该变量不会纳入到不变性条件中(该变量是可变的)
+
+                (3)在访问变量的时候不需要加锁(加锁就没必要使用volatile这种轻量级同步机制了)
 
 
+        4.4 synchronized锁
 
+            (1)synchronized锁定义
+
+                synchronized是Java的一个关键字，它能够将代码块(方法)锁起来，实现同步。
+
+                synchronized是一种互斥锁，一次只能允许一个线程进入被锁住的代码块或方法中。
+
+                synchronized是一种内置锁/监视器锁。Java中每个对象都有一个内置锁(监视器,也可以理解成锁标记)，而synchronized就是
+                使用对象的内置锁(监视器)来将代码块(方法)锁定的。
+
+            (2)synchronized用处
+
+                synchronized保证了线程的原子性。被保护的代码块是一次被执行的，没有任何线程会同时访问。
+
+                synchronized还保证了可见性。当执行完synchronized之后，修改后的变量对其他的线程是可见的。
+
+                Java中的synchronized，通过使用内置锁，来实现对变量的同步操作，进而实现了对变量操作的原子性和其他线程对变量的
+                可见性，从而确保了并发情况下的线程安全。
+
+            (3)synchronized的同步原理
+
+                同步代码块：反编译代码后monitorenter和monitorexit指令实现的(指令进入和指令推出)
+
+                同步方法：方法修饰符上的ACC_SYNCHRONIZED实现。（在这看不出来需要看JVM底层实现）
+
+                synchronized底层是通过monitor对象，对象有自己的对象头，存储了很多信息，其中一个信息标示是被哪个线程持有。
+
+
+            (4)synchronized的使用
+
+                修饰普通方法
+
+                    public class SyncLockTest {
+
+                        // 修饰普通方法，此时用的锁是SyncLockTest对象(内置锁)
+                        public synchronized void test() {
+
+                        }
+                    }
+
+                修饰代码块
+
+                    public class SyncLockTest {
+
+                        public void test() {
+                            // 修饰代码块，此时用的锁是SyncLockTest对象(内置锁)--->this
+                            synchronized (this){
+
+                            }
+                        }
+                    }
+
+                    我们使用synchronized修饰代码块时未必使用this，还可以使用其他的对象(随便一个java对象都有一个内置锁)
+
+                    public class SyncLockTest {
+
+                        // 使用object作为锁(任何对象都有对应的锁标记，object也不例外)
+                        private Object mutex = new Object();
+
+                        public void test() {
+                            // 修饰代码块，此时用的锁是自己创建的锁Object
+                            synchronized (mutex){
+
+                            }
+                        }
+                    }
+
+                修饰静态方法或者静态代码块
+
+                    public class SyncLockTest {
+
+                        //修饰静态方法，静态方法属于类方法，它属于这个类，获取到的锁是属于类的锁(类的字节码文件对象)-->SyncLockTest.class
+                        public static synchronized void test() {
+
+                        }
+
+                        //修饰静态方法里的代码块，静态方法属于类方法，它属于这个类，获取到的锁也是属于类的锁(类的字节码文件对象)-->SyncLockTest.class
+                        public static void test() {
+                            synchronized(SyncLockTest.class){
+
+                            }
+                        }
+
+                    }
+
+            (5)类锁与对象锁
+
+                synchronized修饰静态方法获取的是类锁(类的字节码文件对象)，synchronized修饰普通方法或代码块获取的是对象锁。
+
+
+            (6)synchronized锁释放的时机
+
+                当同步方法或者同步代码块执行完的时候，会自动释放所持有的锁，不需要做任何操作。
+
+                当一个线程执行的代码出现异常后，它所持有的锁会自动释放。不会因为异常而出现死锁情况。
+
+        4.5 Lock显示锁
+
+            Lock方式来获取锁支持中断、超时不获取、是非阻塞的。
+
+            提高了语义化，哪里加锁，哪里解锁都得写出来。
+
+            Lock显式锁可以给我们带来很好的灵活性，但同时我们必须手动释放锁。
+
+            支持Condition条件对象。
+
+            允许多个读线程同时访问共享资源。
+
+            现在Lock锁和synchronized锁的性能其实差别不是很大，而synchronized锁用起来又特别简单。Lock锁还得顾忌到它的
+            特性，要手动释放锁才行(如果忘了释放，这就是一个隐患), 所以我们一般都会使用synchronized锁
+
+
+        4.6 死锁
+
+            两个或两个以上线程处于永久等待状态，每个线程都在等待其他线程释放所持有的资源（锁），就会出现死锁。
+
+
+    5. 线程间通讯
+
+        5.1 wait()与notify()方式
+
+        5.2 join()方式
+
+        5.3 管道（pipeStream）方式
+
+        5.4 线程共享变量 ThreadLocal
+
+
+六、Object对象
 
 
 

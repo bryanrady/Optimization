@@ -1,4 +1,4 @@
-package com.bryanrady.futuretask;
+package com.bryanrady.futuretask.thread;
 
 /**
  * 生产消费模式
