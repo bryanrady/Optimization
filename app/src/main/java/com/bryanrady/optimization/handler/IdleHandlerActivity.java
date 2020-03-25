@@ -1,8 +1,6 @@
 package com.bryanrady.optimization.handler;
-
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.bryanrady.optimization.R;
@@ -10,38 +8,26 @@ import com.bryanrady.optimization.leaked.FixLeakedUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class IdleHandlerActivity extends AppCompatActivity {
+public class IdleHandlerActivity extends AppCompatActivity implements DataModel.OnDataChangeListener {
+
+    private DataModel mDataModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_handler);
+        setContentView(R.layout.activity_idlehandler);
 
-        MyAsyncTask asyncTask = new MyAsyncTask();
-        asyncTask.execute();
+        mDataModel = new DataModel();
+        mDataModel.setOnDataChangeListener(this);
     }
 
-    static class MyAsyncTask extends AsyncTask<String,Integer,String>{
+    public void sync(View view) {
+        mDataModel.syncData();
+    }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-        }
+    @Override
+    public void onDataChange() {
+        Log.d("wangqingbin","更新数据");
     }
 
     @Override
@@ -51,15 +37,4 @@ public class IdleHandlerActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
-
-    public void handler_thread(View view) {
-        Intent intent = new Intent(this, IdleHandlerActivity.class);
-        startActivity(intent);
-    }
-
-    public void pool(View view) {
-        Intent intent = new Intent(this, IdleHandlerActivity.class);
-        startActivity(intent);
-    }
-
 }
