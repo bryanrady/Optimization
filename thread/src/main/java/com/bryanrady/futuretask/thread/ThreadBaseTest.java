@@ -175,7 +175,7 @@ public class ThreadBaseTest {
 //        flagThread.start();
 //        try {
 //            //这里就睡眠1ms就行，免得打印太多的信息
-//            flagThread.sleep(1);
+//            Thread.sleep(1);
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
@@ -186,7 +186,7 @@ public class ThreadBaseTest {
         ThreadFlagThread threadFlagThread = new ThreadFlagThread();
         threadFlagThread.start();
         try {
-            threadFlagThread.sleep(1);
+            Thread.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

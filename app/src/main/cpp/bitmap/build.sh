@@ -31,7 +31,7 @@ export STRIP=${TOOLCHAIN}/bin/${HOST}-strip
 #--prefix=`pwd`/android  指定安装目录是当前目录下的android目录
 ./configure --host=${HOST} \
   --prefix=`pwd`/android \
-  CFLAGS="${ANDROID_CFLAGS} -O3 -fPIE" \
+  CFLAGS="${ANDROID_CFLAGS} -O3 -fPIC" \
   CPPFLAGS="${ANDROID_CFLAGS}" \
-  LDFLAGS="${ANDROID_CFLAGS} -pie" --with-simd ${1+"$@"}
+  LDFLAGS="${ANDROID_CFLAGS} -pic" --with-simd ${1+"$@"}
 make install

@@ -54,7 +54,7 @@ Java_com_bryanrady_optimization_bitmap_compress_file_FileCompressActivity_native
     write_JPEG_file(temp, w, h, quality, path);
 
     AndroidBitmap_unlockPixels(env,bitmap);
-    free(data);
+    free(temp);
     env->ReleaseStringUTFChars(path_, path);
 
 }

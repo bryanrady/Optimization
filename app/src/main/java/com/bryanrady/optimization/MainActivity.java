@@ -12,10 +12,9 @@ import com.bryanrady.optimization.bitmap.BitmapActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
 import com.bryanrady.optimization.shake.ShakeActivity;
-import com.bryanrady.optimization.thread.ThreadActivity;
+import com.bryanrady.optimization.handler.HandlerActivity;
 
 public class MainActivity extends AppCompatActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void thread(View view) {
-        Intent intent = new Intent(this, ThreadActivity.class);
+    public void handler(View view) {
+        Intent intent = new Intent(this, HandlerActivity.class);
         startActivity(intent);
     }
 

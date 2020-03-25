@@ -68,8 +68,13 @@
 
         <activity android:name=".battery.BatteryActivity"/>
 
-        <activity android:name=".thread.ThreadActivity"/>
-        <activity android:name=".thread.pcmode.ProducerConsumerActivity"/>
+        <activity android:name=".handler.HandlerActivity"/>
+        <activity android:name=".handler.HandlerThreadActivity"/>
+        <activity android:name=".handler.IdleHandlerActivity"/>
+
+
+
+
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
