@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import dalvik.system.DexClassLoader;
 import dalvik.system.PathClassLoader;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -18,9 +21,20 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e("wangqingbin",getClassLoader().getClass().getName());
 //        2020-03-26 14:56:22.695 32018-32018/com.bryanrady.reinforce E/wangqingbin: dalvik.system.PathClassLoader
 
+        Log.e("wangqingbin", "activity:" + getApplication());
+        Log.e("wangqingbin", "activity:" + getApplicationContext());
+        Log.e("wangqingbin", "activity:" + getApplicationInfo().className);
+        startService(new Intent(this, MyService.class));
 
+        Intent intent = new Intent("com.dongnao.broadcast.test");
+        intent.setComponent(new ComponentName(getPackageName(), MyBroadCastReciver.class.getName
+                ()));
+        sendBroadcast(intent);
+
+        getContentResolver().delete(Uri.parse("content://com.dongnao.myprovider/test"), null, null);
 
     }
+
 
     /**
      *  Android中用的类加载器有两个 PathClassLoader 和 DexClassLoader

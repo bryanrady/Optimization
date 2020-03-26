@@ -26,6 +26,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".MyService" />
+
+        <receiver android:name=".MyBroadCastReciver">
+            <intent-filter>
+                <action android:name="com.dongnao.broadcast.test" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name=".MyProvider"
+            android:exported="true"
+            android:authorities="com.dongnao.myprovider" />
+
     </application>
 
 </manifest>

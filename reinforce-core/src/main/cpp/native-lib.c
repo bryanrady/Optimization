@@ -11,8 +11,8 @@
 static uint8_t *userkey = "abcdefghijklmnop";
 
 JNIEXPORT void JNICALL
-Java_com_bryanrady_reinforce_1core_DecrptUtils_decrypt(JNIEnv *env, jclass clazz,
-                                                       jbyteArray encrypt_, jstring path_) {
+Java_com_bryanrady_reinforce_1core_DecrptUtils_decrypt(JNIEnv *env, jclass instance,
+                                                jbyteArray encrypt_, jstring path_) {
     jbyte *src = (*env)->GetByteArrayElements(env, encrypt_, NULL);
     const char *path = (*env)->GetStringUTFChars(env, path_, 0);
     int src_len = (*env)->GetArrayLength(env, encrypt_);

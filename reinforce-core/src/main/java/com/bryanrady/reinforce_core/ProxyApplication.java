@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +87,119 @@ public class ProxyApplication extends Application {
          * 2. 加载解密后的多dex
          */
         loadDex(dexFiles, versionDir);
+    }
+
+    /**
+     * 将ProxyApplication替换MyApplication    如果在attachBaseContext()里面替换的话，Application又会被替换回原来的，具体看源码逻辑
+     */
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        try {
+            replaceApplication();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    Application mRealApplication;
+    boolean isBindReal;
+
+    private void replaceApplication() throws Exception {
+        if (isBindReal){
+            return;
+        }
+        Context baseContext = getBaseContext();
+        //如果使用这个库的开发者)没有配置Application 就不用管了
+        if (TextUtils.isEmpty(app_name)){
+            return;
+        }
+        /**
+         * 获得要真正的Application  MyApplication
+         */
+        Class<?> applicationClass = Class.forName(app_name);
+        mRealApplication = (Application) applicationClass.newInstance();
+        Method attachMethod = applicationClass.getDeclaredMethod("attach", Context.class);
+        attachMethod.setAccessible(true);
+        attachMethod.invoke(mRealApplication,baseContext);
+
+        /**
+         *  替换
+         *  ContextImpl -> mOuterContext ProxyApplication->MyApplication
+         */
+        Class<?> contextImplClass = Class.forName("android.app.ContextImpl");
+        Field mOuterContextField = contextImplClass.getDeclaredField("mOuterContext");
+        mOuterContextField.setAccessible(true);
+        mOuterContextField.set(baseContext,mRealApplication);
+
+        /**
+         * ActivityThread  mAllApplications 与 mInitialApplication
+         */
+        //获得ActivityThread对象 ActivityThread 可以通过 ContextImpl 的 mMainThread 属性获得
+        Field mMainThreadField = contextImplClass.getDeclaredField("mMainThread");
+        mMainThreadField.setAccessible(true);
+        Object mMainThread = mMainThreadField.get(baseContext);
+
+        //替换 ActivityThread 里面的 mInitialApplication
+        Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+        Field mInitialApplicationField = activityThreadClass.getDeclaredField("mInitialApplication");
+        mInitialApplicationField.setAccessible(true);
+        mInitialApplicationField.set(mMainThread,mRealApplication);
+
+        //替换 mAllApplications
+        Field mAllApplicationsField = activityThreadClass.getDeclaredField("mAllApplications");
+        mAllApplicationsField.setAccessible(true);
+        ArrayList<Application> mAllApplications = (ArrayList<Application>) mAllApplicationsField.get(mMainThread);
+        mAllApplications.remove(this);
+        mAllApplications.add(mRealApplication);
+
+
+        /**
+         * LoadedApk -> mApplication ProxyApplication
+         */
+        //LoadedApk 可以通过 ContextImpl 的 mPackageInfo 属性获得
+        Field mPackageInfoField = contextImplClass.getDeclaredField("mPackageInfo");
+        mPackageInfoField.setAccessible(true);
+        Object mPackageInfo = mPackageInfoField.get(baseContext);
+
+        Class<?> loadedApkClass = Class.forName("android.app.LoadedApk");
+        Field mApplicationField = loadedApkClass.getDeclaredField("mApplication");
+        mApplicationField.setAccessible(true);
+        mApplicationField.set(mPackageInfo,mRealApplication);
+
+        //修改ApplicationInfo className LoadedApk
+        Field mApplicationInfoField = loadedApkClass.getDeclaredField("mApplicationInfo");
+        mApplicationInfoField.setAccessible(true);
+        ApplicationInfo mApplicationInfo = (ApplicationInfo) mApplicationInfoField.get(mPackageInfo);
+        mApplicationInfo.className = app_name;
+
+        mRealApplication.onCreate();
+        isBindReal = true;
+    }
+
+    @Override
+    public String getPackageName() {
+        //如果meta-data 设置了 application
+        //让ContentProvider创建的时候使用的上下文 在ActivityThread中的installProvider函数
+        //命中else
+        if (!TextUtils.isEmpty(app_name)){
+            return "";
+        }
+        return super.getPackageName();
+    }
+
+
+    @Override
+    public Context createPackageContext(String packageName, int flags) throws PackageManager.NameNotFoundException {
+        if (TextUtils.isEmpty(app_name)){
+            return super.createPackageContext(packageName, flags);
+        }
+        try {
+            replaceApplication();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mRealApplication;
     }
 
     /**
