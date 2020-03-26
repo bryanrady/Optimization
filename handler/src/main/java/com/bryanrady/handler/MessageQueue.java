@@ -35,7 +35,7 @@ public class MessageQueue {
                 /**
                  * 先找到单链表尾巴，然后将新加入的 msg 加入 链表尾端
                  */
-                //prev代表链表最后一条消息
+                //临时变量
                 Message prev;
                 for (;;){
                     prev = p;
