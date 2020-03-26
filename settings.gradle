@@ -1,2 +1,2 @@
-include ':app', ':thread', ':handler'
+include ':app', ':thread', ':handler', ':reinforce', ':reinforce-core'
 rootProject.name='Optimization'

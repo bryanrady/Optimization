@@ -1302,11 +1302,71 @@
 
 六、Object对象
 
+七、反编译
+
+    常用工具：
+    	apktool
+    		https://ibotpeaches.github.io/Apktool/
+
+    		平常开发中，主要资源文件的获取(AndroidManifest/res等)
+
+    		解包：		java -jar apktool_xx.jar d *.apk -o out
+    		重打包：	java -jar apktool_xx.jar b out  -o *.apk
+
+    	dex2jar
+    		https://sourceforge.net/projects/dex2jar/files/
+
+    		将apk中dex反编译成jar（classes.dex转化成jar文件）
+    		d2j-dex2jar.bat *.apk -o out.jar
+
+    	enjarify
+    		https://github.com/google/enjarify
+
+    		将apk反编译成java源码（classes.dex转化成jar文件）
+    		需要安装python3（https://www.python.org/downloads/）
+
+    		enjarify *.apk -o out.jar
+
+    	jd-gui
+    		http://jd.benow.ca/
+
+    		查看反编译后的jar包中的class
+
+    	jadx
+    		https://sourceforge.net/projects/jadx/
+
+    		直接查看资源与代码(不支持跳转)
 
 
+八、混淆Proguard
 
+        https://www.jianshu.com/p/d768f6d1d93b
 
+    对Java代码进行压缩（Shrink）,优化（Optimize）,混淆（Obfuscate）,预检（Preveirfy）。
 
+    1. 压缩（Shrink）:在压缩处理这一步中，用于检测和删除没有使用的类，字段，方法和属性。
 
+　　2. 优化（Optimize）:在优化处理这一步中，对字节码进行优化，并且移除无用指令。
+
+　　3. 混淆（Obfuscate）:在混淆处理这一步中，使用a,b,c等无意义的名称，对类，字段和方法进行重命名。
+
+　　4. 预检（Preveirfy）:在预检这一步中，主要是在Java平台上对处理后的代码进行预检。
+
+    5. Proguard配置
+
+    keep相关可以分为两组，第二组是第一组加"names"。
+
+    -keep
+    	指定类和类成员（变量和方法）不被混淆。
+
+    -keepclassmembers
+    	指定类成员不被混淆(就是-keep的缩小版，不管类名了)。
+
+    -keepclasseswithmembers
+    	指定类和类成员不被混淆，前提是指定的类成员存在。
+
+    没有加names的是From being removed or renamed，即保持不被移除和重命名；加的是From being renamed，即保持不被重命名。
+    两者的区别就是是否保持不被移除，前者如果指定了不被混淆和移除，那么即使这个类或类成员有无用的也会被保留下来；
+    后者如果是无用的类或类成员，即使指定了不被混淆那么也会被移除的。
 
 
