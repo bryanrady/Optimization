@@ -182,6 +182,7 @@ public class ProxyApplication extends Application {
         //如果meta-data 设置了 application
         //让ContentProvider创建的时候使用的上下文 在ActivityThread中的installProvider函数
         //命中else
+        //这样做也是不行的  我们还需要重写createPackageContext（）方法来达到目的
         if (!TextUtils.isEmpty(app_name)){
             return "";
         }
@@ -189,6 +190,13 @@ public class ProxyApplication extends Application {
     }
 
 
+    /**
+     * 这个函数是在installProvider里面调用的
+     * @param packageName
+     * @param flags
+     * @return
+     * @throws PackageManager.NameNotFoundException
+     */
     @Override
     public Context createPackageContext(String packageName, int flags) throws PackageManager.NameNotFoundException {
         if (TextUtils.isEmpty(app_name)){

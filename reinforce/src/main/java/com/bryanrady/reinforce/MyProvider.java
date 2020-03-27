@@ -19,6 +19,14 @@ public class MyProvider extends ContentProvider {
     public static final String TAG = "MyProvider";
 
 
+    /**
+     * Provider的onCreate()函数在Application的onCreate()函数之前。    installContentProviders(app, data.providers);
+     *       installContentProviders（）函数实在我们没有替换Application之前就调用的，所以ContentProvider没有成功打印出自己的
+     *
+     *
+     *
+     * @return
+     */
     @Override
     public boolean onCreate() {
         Log.e(TAG, "provider onCreate:" + getContext());

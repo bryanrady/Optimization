@@ -1,2 +1,2 @@
-include ':app', ':thread', ':handler', ':reinforce', ':reinforce-core', ':reinforce-tools'
+include ':app', ':thread', ':handler', ':reinforce', ':reinforce-core', ':reinforce-tools', ':testreplaceprovider', ':testreplaceprovider', ':testprovider'
 rootProject.name='Optimization'
