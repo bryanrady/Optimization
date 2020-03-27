@@ -12,11 +12,36 @@ android {
         versionCode 1
         versionName "1.0"
 
+        //dex分包
+        multiDexEnabled true
+        ////flavor dimension 表示它的维度就是该版本号，这样维度就是都是统一的了
+        flavorDimensions "versionCode"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    //做上下兼容
+    productFlavors {
+        // Define separate dev and prod product flavors.
+        dev {
+            // dev utilizes minSDKVersion = 21 to allow the Android gradle plugin
+            // to pre-dex each module and produce an APK that can be tested on
+            // Android Lollipop without time consuming dex merging processes.
+            minSdkVersion 21
+        }
+        prod {
+            // The actual minSdkVersion for the application.
+            minSdkVersion 14
+        }
     }
 
     buildTypes {
         release {
+            //保证dex.keep文件下面的类打到主dex上面 就是修复包一定要打到classes.dex上面
+            multiDexKeepFile file('dex.keep')
+            def myFile = file('dex.keep')
+            println("isFileExists:" + myFile.exists())
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -31,4 +56,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //用来分包 分成多个classes.dex文件
+    implementation 'com.android.support:multidex:1.0.3'
+
 }

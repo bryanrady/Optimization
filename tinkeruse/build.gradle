@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.tencent.tinker.patch'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+
+
+    defaultConfig {
+        applicationId "com.example.tinkeruse"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    //签名配置
+    signingConfigs {
+        release {
+            try {
+                storeFile file("tinkeruse.jks")
+                storePassword "123456"
+                keyAlias "tinkeruse"
+                keyPassword "123456"
+            } catch (ex) {
+                throw new InvalidUserDataException(ex.toString())
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            //开启签名
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //optional, help to generate the final application
+    provided('com.tencent.tinker:tinker-android-anno:1.9.1')
+    //tinker's main Android lib
+    compile('com.tencent.tinker:tinker-android-lib:1.9.1')
+}

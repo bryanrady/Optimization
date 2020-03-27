@@ -1,0 +1,53 @@
+-----------------------Tinker patch begin-----------------------
+configuration: 
+oldApk:C:\Users\Administrator\Desktop\tinker\tools\脚本相关\old.apk
+newApk:C:\Users\Administrator\Desktop\tinker\tools\脚本相关\new.apk
+outputFolder:C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output
+isIgnoreWarning:false
+7-ZipPath:7za
+useSignAPk:true
+package meta fields: 
+filed name:patchMessage, filed value:classes.dex
+filed name:platform, filed value:all
+dex configs: 
+dexMode: jar
+dexPattern:classes.*\.dex
+dexPattern:assets/secondary-dex-.\.jar
+dex loader:com.tencent.tinker.loader.*
+dex loader:tinker.sample.android.app.SampleApplication
+lib configs: 
+libPattern:lib/armeabi/.*\.so
+resource configs: 
+resPattern:res/.*
+resPattern:resources\.arsc
+resPattern:AndroidManifest\.xml
+resPattern:assets/.*
+resIgnore change:assets/sample_meta\.txt
+largeModSize:100kb
+useApplyResource:false
+
+Analyze old and new apk files:
+old apk: old.apk, size=939590, md5=96c465f8e46cc37eb55657d57abe64a8
+new apk: new.apk, size=939582, md5=a016e4bcb3a0b4b20aeb7a44b68ca6ef
+UnZipping apk to C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\old
+UnZipping apk to C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\new
+Check for loader classes in dex: classes.dex
+
+Gen classes.dex patch file:C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\tinker_result\classes.dex, size:377, md5:2372dd46911530aeb44a38231ec497b2
+Verifying if patched new dex is logically the same as original new dex: new/classes.dex ...
+
+Gen classes.dex for dalvik full dex file:C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\tempPatchedDexes\classes.dex, size:934524, md5:42c389704a35c5e4aac4e8f328ae6b8d
+DexDecoder:write meta file data: classes.dex,,42c389704a35c5e4aac4e8f328ae6b8d,42c389704a35c5e4aac4e8f328ae6b8d,2372dd46911530aeb44a38231ec497b2,1850728900,jar
+
+Add test install result dex: C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\tinker_result\test.dex, size:584
+DexDecoder:write test dex meta file data: test.dex,,56900442eb5b7e1de45449d0685e6e00,56900442eb5b7e1de45449d0685e6e00,0,0,jar
+Generate unsigned apk: patch_unsigned.apk
+Signing apk: patch_signed.apk
+Signing key algorithm is SHA1withRSA
+Try use 7za to compress the patch file: patch_signed_7zip.apk, will cost much more time
+Current 7za path:7za
+7a patch file failed, you should set the zipArtifact, or set the path directly
+Result: final signed patch result: C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output\patch_signed.apk, size=3314
+Tinker patch done, total time cost: 2.350000s
+Tinker patch done, you can go to file to find the output C:\Users\Administrator\Desktop\tinker\tools\脚本相关\output
+-----------------------Tinker patch end-------------------------

@@ -1,0 +1,8 @@
+﻿
+
+官网地址:https://github.com/Tencent/tinker
+tinker     打差分包
+java -jar tinker-patch-cli-1.7.7.jar -old old.apk -new new.apk -config tinker_config.xml -out output
+
+自己打差分包
+dx  --dex --output C:\User\dex\out.dex   C:\User\dex\

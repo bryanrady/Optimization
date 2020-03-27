@@ -32,10 +32,6 @@ public class TinkerManager {
     }
 
     public static void fix(Context context) {
-        //1.将外置卡中的dex文件复制到data/data/packageName/odex/目录下
-        moveDex2Odex(context);
-
-        //2.加载odex目录下的dex文件
         try {
             loadDex(context);
         } catch (Exception e) {
@@ -48,11 +44,14 @@ public class TinkerManager {
      * @param context
      */
     private static void loadDex(Context context) throws Exception{
+        if (context == null) {
+            return;
+        }
         File odexDir = context.getDir("odex", Context.MODE_PRIVATE);
         //1.先获取odex目录下面的所有文件
         File[] files = odexDir.listFiles();
         for (File file : files){
-            if (file.getName().endsWith("classes") || file.getName().endsWith(".dex")){
+            if (file.getName().startsWith("classes") || file.getName().endsWith(".dex")){
                 Log.d("wangqingbin","found dex file: " + file.getName());
                 mLoadDexSet.add(file);
             }
@@ -95,6 +94,7 @@ public class TinkerManager {
             //生成一个新的dexElements数组
             Object newDexElements = Array.newInstance(componentTypeClass, newLength);
             for (int i = 0; i < newLength; i++){
+                //这里要保证修复的dex文件在dexElements数组的前面，才能达到修复
                 if (i <myLength){
                     Array.set(newDexElements, i, Array.get(myDexElements, i));
                 }else{
@@ -112,7 +112,7 @@ public class TinkerManager {
      * 将外置卡中的dex文件复制到data/data/packageName/odex/目录下
      * @param context
      */
-    private static void moveDex2Odex(Context context){
+    public static void moveSdcardDex2Odex(Context context){
         File odexDir = context.getDir("odex", Context.MODE_PRIVATE);
         String name = "out.dex";
         String filePath = new File(odexDir, name).getAbsolutePath();
