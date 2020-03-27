@@ -38,7 +38,7 @@
         <provider
             android:name=".MyProvider"
             android:exported="true"
-            android:authorities="com.dongnao.myprovider" />
+            android:authorities="com.bryanrady.myprovider" />
 
     </application>
 

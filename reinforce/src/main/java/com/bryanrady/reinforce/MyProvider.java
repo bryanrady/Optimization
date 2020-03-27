@@ -57,6 +57,9 @@ public class MyProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[]
             selectionArgs) {
+        //其他应用访问Provider的话 直接在其它工程调用这个测试即可
+//        getContentResolver().delete(Uri.parse("content://com.dongnao.myprovider/test"), null,
+//                null);
         Log.e(TAG, "provider delete:" + getContext());
         return 0;
     }
