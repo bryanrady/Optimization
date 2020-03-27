@@ -12,89 +12,101 @@ import java.io.RandomAccessFile;
  */
 public class Main {
 
+    /**
+     *      reinforce-core      android library工程   专门用来进行dex解密的
+     *
+     *          library         编译后生成的文件是   arr
+     *          application     编译后生成的文件是   apk
+     *
+     *      reinforce-tools     java工程              专门用来进行dex加密的
+     *
+     */
+
     public static void main(String[] args) throws Exception {
         /**
-         * 1、制作只包含解密工程（reinforce-core）的dex文件
+         * 1、制作 reinforce-core 解密工程的 classes.dex文件，存在于reinforce-tools工程的temp目录下
          */
-        //1.1 解压aar 获得classes.jar
-        File aarFile = new File("reinforce-core/build/outputs/aar/reinforce-core-debug.aar");
-        File aarTemp = new File("reinforce-tools/temp");
-        Zip.unZip(aarFile, aarTemp);
-        File classesJar = new File(aarTemp, "classes.jar");
-        //1.2 执行dx命令 将jar变成dex文件
-        File classesDex = new File(aarTemp, "classes.dex");
+        //(1) 将reinforce-core生成的reinforce-core-debug.aar文件解压到reinforce-tools的temp目录下面
+        File coreAarFile = new File("reinforce-core/build/outputs/aar/reinforce-core-debug.aar");
+        File toolsTemp = new File("reinforce-tools/temp");
+        Zip.unZip(coreAarFile, toolsTemp);
+
+        //(2) 得到reinforce-tools工程下面temp目录的classes.jar文件  执行dx命令 将classes.jar文件变成同级目录下的classes.dex文件
+        File toolsClassesJar = new File(toolsTemp, "classes.jar");
+        File toolsClassesDex = new File(toolsTemp, "classes.dex");
         //执行命令  windows:cmd /c  linux/mac不需要（cmd /c）
-        Process process = Runtime.getRuntime().exec("cmd /c dx --dex --output "
-                + classesDex.getAbsolutePath() + " " + classesJar.getAbsolutePath());
+        Process process = Runtime.getRuntime().exec(
+                "cmd /c dx --dex --output "
+                + toolsClassesDex.getAbsolutePath() + " " + toolsClassesJar.getAbsolutePath());
         process.waitFor();
-        //失败
         if (process.exitValue() != 0) {
-            throw new RuntimeException("dex error");
+            throw new RuntimeException("classes.jar change to classes.dex error");
         }
 
         /**
-         * 2、加密apk中所有dex文件
+         * 2、将reinforce工程的apk进行解压，然后对reinforce工程的apk解压后的所有dex文件进行加密
          */
-        //2.1 解压apk 获得所有的dex文件
-        File apkFile = new File("reinforce/build/outputs/apk/debug/reinforce-debug.apk");
-        File apkTemp = new File("reinforce/build/outputs/apk/debug/temp");
-        Zip.unZip(apkFile, apkTemp);
-        //获得所有的dex
-        File[] dexFiles = apkTemp.listFiles(new FilenameFilter() {
+        //(1) 将reinforce工程的reinforce-debug.apk文件解压到一个temp目录下
+        File reinforceApkFile = new File("reinforce/build/outputs/apk/debug/reinforce-debug.apk");
+        File reinforceApkTemp = new File("reinforce/build/outputs/apk/debug/temp");
+        Zip.unZip(reinforceApkFile, reinforceApkTemp);
+
+        //(2)获取reinforce工程temp目录下的所有dex文件
+        File[] dexFiles = reinforceApkTemp.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
                 return s.endsWith(".dex");
             }
         });
-        //初始化aes
+
+        //(3) 使用AES加密算法加密reinforce工程的所有dex文件
         AES.init(AES.DEFAULT_PWD);
         for (File dex : dexFiles) {
-            //读取文件数据
+            //读取dex文件数据
             byte[] bytes = getBytes(dex);
             //加密
             byte[] encrypt = AES.encrypt(bytes);
-            //写到指定目录
-            FileOutputStream fos = new FileOutputStream(new File(apkTemp, "secret-" + dex.getName()));
+            //写到指定文件
+            FileOutputStream fos = new FileOutputStream(new File(reinforceApkTemp, "secret-" + dex.getName()));
             fos.write(encrypt);
             fos.flush();
             fos.close();
+            //把已经加了密的dex文件进行删除
             dex.delete();
         }
 
         /**
-         * 3、把classes.dex 放入 apk解压目录 在压缩成apk
+         * 3、将reinforce-tools工程的temp目录下面的classes.dex文件放到reinforce工程下面的temp目录，
+         *    然后将reinforce工程的temp目录下的所有文件压缩成reinforce-unsigned.apk
          */
-        classesDex.renameTo(new File(apkTemp, "classes.dex"));
+        toolsClassesDex.renameTo(new File(reinforceApkTemp, "classes.dex"));
         File unSignedApk = new File("reinforce/build/outputs/apk/debug/reinforce-unsigned.apk");
-        Zip.zip(apkTemp, unSignedApk);
+        Zip.zip(reinforceApkTemp, unSignedApk);
 
         /**
-         * 4、对齐与签名  Android用户指南
+         *  4、对齐与签名  Android用户指南
          */
-        //4.1 对齐
-//       26.0.2不认识-p参数 zipalign -v -p 4 reinforce-unsigned.apk reinforce-unsigned-aligned.apk
+        //(1) 对齐
+        //对齐命令: zipalign -v -p 4 reinforce-unsigned.apk reinforce-unsigned-aligned.apk
         File alignedApk = new File("reinforce/build/outputs/apk/debug/reinforce-unsigned-aligned.apk");
-        process = Runtime.getRuntime().exec("cmd /c zipalign -f 4 " + unSignedApk
-                .getAbsolutePath() + " " +
-                alignedApk.getAbsolutePath());
+        //26.0.2不认识-p参数
+        process = Runtime.getRuntime().exec("cmd /c zipalign -f 4 "
+                + unSignedApk.getAbsolutePath() + " " + alignedApk.getAbsolutePath());
         process.waitFor();
-        //失败
         if (process.exitValue() != 0) {
-            throw new RuntimeException("zipalign error");
+            throw new RuntimeException("zipalign failed");
         }
 
-        //4.2 签名
-//        apksigner sign  --ks jks文件地址 --ks-key-alias 别名 --ks-pass pass:jsk密码 --key-pass
-// pass:别名密码 --out  out.apk in.apk
+        //(2) 签名
+        //签名命令: apksigner sign  --ks jks文件地址 --ks-key-alias 别名 --ks-pass pass:jsk密码 --key-pass  pass:别名密码 --out  out.apk in.apk
         File signedApk = new File("reinforce/build/outputs/apk/debug/reinforce-signed-aligned.apk");
         File jks = new File("reinforce-tools/reinforce.jks");
-        process = Runtime.getRuntime().exec("cmd /c apksigner sign  --ks " + jks.getAbsolutePath
-                () + " --ks-key-alias reinforce --ks-pass pass:123456 --key-pass  pass:123456 --out" +
-                " " + signedApk.getAbsolutePath() + " " + alignedApk.getAbsolutePath());
+        process = Runtime.getRuntime().exec("cmd /c apksigner sign  --ks " + jks.getAbsolutePath()
+                + " --ks-key-alias reinforce --ks-pass pass:123456 --key-pass  pass:123456 --out"
+                + " " + signedApk.getAbsolutePath() + " " + alignedApk.getAbsolutePath());
         process.waitFor();
-        //失败
         if (process.exitValue() != 0) {
-            throw new RuntimeException("apksigner error");
+            throw new RuntimeException("apksigner failed");
         }
 
     }

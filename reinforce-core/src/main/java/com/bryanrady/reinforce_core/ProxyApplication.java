@@ -17,8 +17,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import dalvik.system.BaseDexClassLoader;
-import dalvik.system.PathClassLoader;
 
 /**
  * 这个工程用来解密与加载多dex文件
