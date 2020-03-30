@@ -13,9 +13,11 @@ public class StringTest {
         String str4 = "a" + str2;
         final String str5 = "bc";
         String str6 = "a" + str5;
+        final String str7 = "a" + str2;
         System.out.println(str1 == str3);
         System.out.println(str1 == str4);
         System.out.println(str1 == str6);
+        System.out.println(str1 == str7);
     }
 
 }
