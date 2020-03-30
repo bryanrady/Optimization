@@ -2,9 +2,12 @@ package com.bryanrady.optimization.leaked;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.bryanrady.optimization.R;
+import com.bryanrady.optimization.bean.Student;
+import com.bryanrady.optimization.bean.Student2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +17,12 @@ public class LeakedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaked);
+
+        Student stu = (Student) getIntent().getParcelableExtra("stu");
+        Log.d("wangqingbin","stu: age == " + stu.getAge() + ", name == " + stu.getName());
+
+        Student2 stu2 = (Student2) getIntent().getSerializableExtra("stu2");
+        Log.d("wangqingbin","stu2: age == " + stu2.getAge() + ", name == " + stu2.getName());
     }
 
     public void static_field(View view) {

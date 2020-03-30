@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
 
-    //private static Student mStudent;
+    //private static Student2 mStudent;
     private static FixStudent mFixStudent;
     //private static FixStudent2 mFixStudent2;
     private static FixStudent3 mFixStudent3;
@@ -32,7 +32,7 @@ public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
         tv.setText("外部类含有非静态内部类的静态变量造成的内存泄漏");
 
 //        if(mStudent == null){
-//            mStudent = new Student();
+//            mStudent = new Student2();
 //            mStudent.study();
 //        }
 
@@ -66,7 +66,7 @@ public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
      *
      *  NonStaticInnerClassLeakActivity.mStudent
      *
-     *  NonStaticInnerClassLeakActivity$Student.this$0
+     *  NonStaticInnerClassLeakActivity$Student2.this$0
      *
      *  根据提示 我们可以看到因为NonStaticInnerClassActivity$Student发生了内存泄漏
      *
@@ -105,7 +105,7 @@ public class NonStaticInnerClassLeakActivity extends AppCompatActivity {
      *
      *  NonStaticInnerClassLeakActivity.mStudent
      *
-     *  NonStaticInnerClassLeakActivity$Student$FixStudent.mActivity
+     *  NonStaticInnerClassLeakActivity$Student2$FixStudent.mActivity
      *
      *  按照上面的写法还是发生了内存泄漏，原因如下：
      *

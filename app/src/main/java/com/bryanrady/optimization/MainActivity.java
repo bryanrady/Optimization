@@ -8,6 +8,8 @@ import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
+import com.bryanrady.optimization.bean.Student;
+import com.bryanrady.optimization.bean.Student2;
 import com.bryanrady.optimization.bitmap.BitmapActivity;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 import com.bryanrady.optimization.leaked.LeakedActivity;
@@ -24,6 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void leaked(View view) {
         Intent intent = new Intent(this, LeakedActivity.class);
+        Student stu = new Student();
+        stu.setAge(20);
+        stu.setName("张三");
+        intent.putExtra("stu",stu);
+
+        Student2 stu2 = new Student2();
+        stu2.setAge(21);
+        stu2.setName("李四");
+        intent.putExtra("stu2",stu2);
         startActivity(intent);
     }
 
