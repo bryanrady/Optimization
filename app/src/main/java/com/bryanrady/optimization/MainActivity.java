@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
+import com.bryanrady.optimization.base.component.FirstActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
 import com.bryanrady.optimization.bean.Student;
 import com.bryanrady.optimization.bean.Student2;
@@ -63,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void test(View view) {
+        Intent intent = new Intent(this, FirstActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -70,6 +76,5 @@ public class MainActivity extends AppCompatActivity {
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
     }
-
 
 }

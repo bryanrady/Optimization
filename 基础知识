@@ -1,0 +1,48 @@
+一、Activity
+    1.定义
+        四大组件之一，是用户交互的界面。一般的来说一个用户交互界面对应一个activity。
+
+    2.生命周期
+        Activity从创建到销毁之间有多种状态，每一种状态对应一个生命周期方法。这些回调方法包括：
+        onCreate()、onStart()、onResume()、onPause()、onStop()、onDestroy()。
+
+        这些方法都是两两对立的：
+            onCreate()和onDestroy()  ---------   创建和销毁
+            onStart()和onStop()      ---------   可见与不可见
+            onResume()和onPause()    ---------   可编辑和不可编辑
+
+        (1)界面从创建到跳转到界面B，再从界面B返回，两个Activity的生命周期变化？
+                A创建到可见过程。
+            A：onCreate()->onStart()->onResume();
+                A跳转到B，即B创建到可见过程，这时候A失去了焦点，处于不可编辑状态。B可见后，A就不可见了。
+            A：onPause();
+            B: onCreate()->onStart()->onResume();
+            A: onStop();
+                从B返回到A的过程。即B失去了焦点，处于不可编辑状态，重新进入到A可见，然后B不可见到销毁
+            B：onPause();
+            A：onRestart()->onStart()->onResume();
+            B：onStop()->onDestroy();
+
+        (2)界面从创建到跳转到界面B(B界面是透明主题的或者是Dialog形式的)，再从界面B返回，两个Activity的生命周期变化？
+                 A创建到可见过程。
+            A：onCreate()->onStart()->onResume();
+                A跳转到B，即B创建到可见过程，这时候A失去了焦点，处于不可编辑状态。B可见后，A就不可见了。
+            A：onPause();
+            B: onCreate()->onStart()->onResume();
+            A: onStop();
+                从B返回到A的过程。即B失去了焦点，处于不可编辑状态，重新进入到A可见，然后B不可见到销毁
+            B：onPause();
+            A：onResume();   因为B是透明的或者是Dialog形式的，说明A还是可见的，所以不会调用onReStart()和onStart()了。
+            B：onStop()->onDestroy();
+
+        (3)创建界面A后，点击Home按键，再回到界面A，这是A的生命周期变化？
+            创建A
+        A：onCreate()->onStart()->onResume();
+            点击Home键
+        A：onPause->onStop();
+            再次回到A
+        A：onRestart()->onStart()->onResume();
+
+        (4)
+
+    3.
