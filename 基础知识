@@ -43,6 +43,71 @@
             再次回到A
         A：onRestart()->onStart()->onResume();
 
-        (4)
+        (4)两个Activity之间的跳转必定会执行的是哪几个生命周期方法？
+            前一个activity的onPause()和后一个Activity的onResume();
 
-    3.
+        (5)横竖屏切换，Activity的生命周期变化？
+           竖屏切横竖：onPause()->onStop()->onDestroy()->onCreate()->onStart()->onRestart()。
+           横竖切竖屏：onPause()->onStop()->onDestroy()->onCreate()->onStart()->onRestart()。
+           这两次切换都不会回调：onConfigurationChanged()方法。
+
+           有的人说横屏切竖屏会打印两次相同的生命周期方法，但是我的测试是只有一次，具体原因
+           没有深究，不知道是否与机型有关。
+
+           如果在AndroidManifest.xml文件中设置该Activity的configChanges="orientation"时：
+           竖屏切横竖：onPause()->onStop()->onDestroy()->onCreate()->onStart()->onRestart()。
+           横竖切竖屏：什么都不打印。
+           这两次切换都会回调：onConfigurationChanged()方法。好像只要有orientation这个属性，
+           就都会回调onConfigurationChanged()方法。
+
+    3. onSaveInstanceState()和onRestoreInstanceState()会在什么时候回调?
+        当系统“未经用户许可”准备让Activity变得失去焦点时()，onSaveInstanceState()会被系统调用，
+        因为它必须要提供一个机会让用户能够保存数据(当然保不保存就是你自己的事情了)。如果我们是
+        通过返回按钮返回上一个Activity，则这个Activity的 onSaveInstanceState()不会被回调，因为
+        这个是用户自己选择的操作，不是系统原因。
+        onSaveInstanceState()一般都是在onPause回调之后进行回调。
+        以下几种情况的分析都遵循该原则：
+        (1)长按Home键，选择运行其他的程序时。
+        (2)按下电源按键（关闭屏幕显示）时。
+        (3)从Activity A中启动一个新的Activity时。
+        (4)屏幕方向切换时，例如从竖屏切换到横屏时。
+
+        至于onRestoreInstanceState()方法，需要注意的是，onSaveInstanceState()和onRestoreInstanceState()
+        “不一定”是成对的被调用的。onRestoreInstanceState()被调用的前提是，Activity A“确实”被系统销毁了。
+        而如果仅仅是停留在有这种可能性的情况下，则该方法不会被调用，例如，当正在显示Activity A的时候，
+        用户按下Home键回到主界面，然后用户紧接着又返回到activity A，这种情况下Activity A一般不会因为内存的
+        原因被系统销毁，故Activity A的onRestoreInstanceState方法不会被执行。
+        而横竖屏切换的时候Activity是真正的被系统销毁了，所以会调用onRestoreInstanceState()。
+        onRestoreInstanceState()一般都是在onResume()回调之前进行回调。
+
+    4. Activity的四种启动模式及应用场景
+        (1)standard     标准启动模式(Activity的默认启动模式)
+            每启动一个Activity，都会创建一个新的实例，不管栈中是否已经存在这个实例，每次都会创建的实例存放于栈顶。
+            返回的时候，将这个Activity对应的实例出栈。
+
+            应用场景：这个好像程序大多数都是默认用这个实例的。
+
+        (2)singleTop    栈顶复用模式
+            每启动一个Activity，如果该Activity对应的实例位于栈顶，则不会创建新的实例，直接复用当前Activity对应
+            的实例，即不会走该Activity的onCreate()->onStart()，直接走该Activity的onPause()->onNewIntent()->onResume();
+            如果该Activity对应的实例没有位于栈顶，则会创建新的实例。
+
+            应用场景：系统推送通知栏。
+
+        (3)singleTask   栈中复用模式
+            每启动一个Activity，如果栈中已经存在该Activity对应的实例，则不会创建新的实例，并将它实例上面的Activity
+            都出栈，直到该Activity位于栈顶，即不会走该Activity的onCreate()->onResume()；直接回调onIntent(),直接走
+            该Activity的onRestart()->onStart()->onResume()；如果栈中不存在该Activity对应的实例，就会创建新的实例存
+            放于栈顶。
+
+            应用场景：程序模块逻辑入口，应用的主页面和登录页面(我们肯定不会让我们的主界面和登录页面被多次创建，而且
+            在主界面或者登录页面退出应用程序是最好的选择)；
+            WebView页面、扫一扫页面、购物页面、确认订单页面、付款页面等。
+
+        (4)singleInstance   单一实例模式
+            每启动一个Activity，都会将该Activity存放于单独的一个栈中，并且这个栈中只有该Activity一个实例，下次再启动
+            这个Activity的时候，都不会创建新的实例，而是将以前创建的Activity从独立的栈中唤醒。执行流程和已经存在有实
+            例的singleTask启动模式差不多，也直接回调onIntent(),直接走该Activity的onRestart()->onStart()->onResume()。
+
+            应用场景：Launcher页面、电话页面、闹钟等系统应用 。
+

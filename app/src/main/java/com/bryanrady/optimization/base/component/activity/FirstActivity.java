@@ -1,6 +1,7 @@
-package com.bryanrady.optimization.base.component;
+package com.bryanrady.optimization.base.component.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -78,8 +79,36 @@ public class FirstActivity extends AppCompatActivity {
         Log.d("wangqingbin",key);
     }
 
+    /**
+     * 横竖屏切换调用
+     * @param newConfig
+     */
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("wangqingbin","A  onConfigurationChanged........");
+    }
+
     public void jump(View view) {
         Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public void jumpSingleTop(View view) {
+        Intent intent = new Intent(this, SingleTopActivity.class);
+        intent.putExtra("key","new key");
+        startActivity(intent);
+    }
+
+    public void jumpSingleTask(View view) {
+        Intent intent = new Intent(this, SingleTaskActivity.class);
+        intent.putExtra("key","new key");
+        startActivity(intent);
+    }
+
+    public void jumpSingleInstance(View view) {
+        Intent intent = new Intent(this, SingleInstanceActivity.class);
+        intent.putExtra("key","new key");
         startActivity(intent);
     }
 }

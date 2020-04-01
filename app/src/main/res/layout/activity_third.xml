@@ -4,26 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:onClick="jump"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="跳转Standard页面" />
-
-    <Button
-        android:onClick="jumpSingleTop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="跳转SingleTop页面" />
-
 
     <Button
         android:onClick="jumpSingleTask"

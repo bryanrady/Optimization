@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
-import com.bryanrady.optimization.base.component.FirstActivity;
+import com.bryanrady.optimization.base.component.activity.FirstActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
 import com.bryanrady.optimization.bean.Student;
 import com.bryanrady.optimization.bean.Student2;

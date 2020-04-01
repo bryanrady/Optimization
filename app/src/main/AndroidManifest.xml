@@ -72,8 +72,19 @@
         <activity android:name=".handler.HandlerThreadActivity"/>
         <activity android:name=".handler.IdleHandlerActivity"/>
 
-        <activity android:name=".base.component.FirstActivity" />
-        <activity android:name=".base.component.SecondActivity" />
+        <activity
+            android:name=".base.component.activity.FirstActivity" />
+        <activity android:name=".base.component.activity.SecondActivity" />
+        <activity
+            android:name=".base.component.activity.SingleTopActivity"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".base.component.activity.SingleTaskActivity"
+            android:launchMode="singleTask"/>
+        <activity
+            android:name=".base.component.activity.SingleInstanceActivity"
+            android:launchMode="singleInstance"/>
+        <activity android:name=".base.component.activity.ThirdActivity" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
