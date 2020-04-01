@@ -1,8 +1,14 @@
 package com.bryanrady.futuretask;
 
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +26,6 @@ public class ThreadPoolExecutorTest {
 
     static {
         //自己配置线程池
-
 //        corePoolSize: 核心线程数量，可以类比正式员工数量，常驻线程数量。
 //        maximumPoolSize: 最大的线程数量，公司最多雇佣员工数量。常驻+临时线程数量。
 //        workQueue：多余任务等待队列，再多的人都处理不过来了，需要等着，在这个地方等。
@@ -37,12 +42,85 @@ public class ThreadPoolExecutorTest {
                 workQueue);
 
         THREAD_POOL_EXECUTOR = threadPoolExecutor;
-
     }
 
-
     public static void main(String[] args) {
+    //    test1();
+        test2();
+    }
 
+    private static void test2() {
+//        ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(5);
+//        for (int i=0; i<Integer.MAX_VALUE; i++){
+//            newFixedThreadPool.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        Thread.sleep(200);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println(Thread.currentThread().getName() + ": run");
+//                }
+//            });
+//        }
+
+//        ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
+//        for (int i = 0; i < 5; i++) {
+//            newCachedThreadPool.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    System.out.println(Thread.currentThread().getName() + ": run");
+//                }
+//            });
+//        }
+
+//        ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
+//        for (int i = 0; i < 5; i++) {
+//            newSingleThreadExecutor.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println(Thread.currentThread().getName() + ": run");
+//                }
+//            });
+//        }
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
+        for (int i = 0; i < 5; i++) {
+//            scheduledExecutorService.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println(Thread.currentThread().getName() + ": run");
+//                }
+//            });
+            scheduledExecutorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println(Thread.currentThread().getName() + ": run");
+                }
+            },2,TimeUnit.SECONDS);
+
+//            scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
+//                @Override
+//                public void run() {
+//                    System.out.println("current Time" + System.currentTimeMillis());
+//                    System.out.println(Thread.currentThread().getName() + ": run");
+//                }
+//            },1, 3, TimeUnit.SECONDS);
+        }
+    }
+
+    private static void test1(){
         THREAD_POOL_EXECUTOR.setRejectedExecutionHandler(new RejectedExecutionHandler() {
             @Override
             public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
@@ -55,20 +133,145 @@ public class ThreadPoolExecutorTest {
             }
         });
 
-        for (int i = 0; i < 30; i++){
-            THREAD_POOL_EXECUTOR.execute(new Runnable() {
-                @Override
-                public void run() {
-                    //这里这样写是为了让线程中的任务一直无法完成，
-                    while (true){
+//        for (int i = 0; i < 30; i++){
+//            THREAD_POOL_EXECUTOR.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    //这里这样写是为了让线程中的任务一直无法完成，
+//                    while (true){
+//
+//                    }
+//                }
+//            });
+//        }
 
-                    }
-                }
-            });
+//        线程池异常处理：
+//        在使用线程池处理任务的时候，任务代码可能抛出RuntimeException，抛出异常后，线程池可能捕获它，也可能创建一个新的线程
+//        来代替异常的线程，我们可能无法感知任务出现了异常，因此我们需要考虑线程池异常情况。
+        for (int i = 0; i < 5; i++){
+            /**
+             * 这个不会打印出现异常，会一直执行下去
+             */
+//            THREAD_POOL_EXECUTOR.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    System.out.println(Thread.currentThread().getName());
+//                    Object obj = null;
+//                    System.out.println("result : "+ obj.toString());
+//                }
+//            });
+            /**
+             * 1. 直接通过try/catch来捕获任务块可能出现的异常
+             */
+//            THREAD_POOL_EXECUTOR.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        System.out.println(Thread.currentThread().getName());
+//                        Object obj = null;
+//                        System.out.println("result : "+ obj.toString());
+//                    }catch (Exception e){
+//                        System.out.println("exception");
+//                    }
+//                }
+//            });
+
+            /**
+             * 2.submit提交的任务，可以通过Future对象的get()方法接收补货的异常，再进行处理，get()是个阻塞的方法
+             */
+//            Future<?> future = THREAD_POOL_EXECUTOR.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        System.out.println(Thread.currentThread().getName());
+//                        Object obj = null;
+//                        System.out.println("result : " + obj.toString());
+//                    } catch (Exception e) {
+//                        System.out.println("exception");
+//                    }
+//                }
+//            });
+//            try {
+//                future.get();
+//            } catch (Exception e) {
+//                System.out.println("exception");
+//            }
+
+            /**
+             * 3.通过线程的UncaughtExceptionHandler来捕获异常
+             */
+//            MyRunnable r = new MyRunnable();
+//            Thread t = new Thread(r);
+//            t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//                @Override
+//                public void uncaughtException(Thread t, Throwable e) {
+//                    System.out.println("exception : "+ e.getMessage());
+//                }
+//            });
+//            THREAD_POOL_EXECUTOR.execute(r);
+
         }
 
+        /**
+         * 4.通过继承ThreadPoolExecutor类重写afterExecute()方法，根据传下来的Runnable通过get()方法来捕获异常，和第2种基本类似
+         */
+//        ExceptionHandlerExecutor exceptionHandlerExecutor =
+//                new ExceptionHandlerExecutor(
+//                        10,
+//                        20,
+//                        30,
+//                        TimeUnit.SECONDS,
+//                        workQueue);
+//
+//        for (int i = 0; i< 5; i++){
+//            exceptionHandlerExecutor.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    System.out.println(Thread.currentThread().getName());
+//                    Object obj = null;
+//                    System.out.println("result : "+ obj.toString());
+//                }
+//            });
+//        }
+//
+//        exceptionHandlerExecutor.shutdown();
         //最后关闭
         THREAD_POOL_EXECUTOR.shutdown();
+    }
+
+    static class MyRunnable implements Runnable{
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName());
+            Object obj = null;
+            System.out.println("result : "+ obj.toString());
+        }
+    }
+
+    static class ExceptionHandlerExecutor extends ThreadPoolExecutor{
+
+        public ExceptionHandlerExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        }
+
+        /**
+         * 这个是执行完成后的钩子函数
+         * @param r
+         * @param t
+         */
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            if (r != null && r instanceof Future<?>){
+                try {
+                    ((Future) r).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -83,7 +286,6 @@ public class ThreadPoolExecutorTest {
      *      拒绝会打印5次信息
      *
      */
-
 
 //            Exception in thread "main" java.util.concurrent.RejectedExecutionException: Task com.bryanrady.futuretask.
 //                    ThreadPoolExecutorTest$1@5e2de80c rejected from java.util.concurrent.ThreadPoolExecutor@1d44bcfa

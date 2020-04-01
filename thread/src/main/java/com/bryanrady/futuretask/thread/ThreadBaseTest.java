@@ -1,5 +1,15 @@
 package com.bryanrady.futuretask.thread;
 
+import com.sun.org.apache.bcel.internal.generic.GETFIELD;
+
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+
 /**
  * Java多线程基础-使用多线程
  * https://www.jianshu.com/p/d901b25e0d4a
@@ -17,7 +27,8 @@ public class ThreadBaseTest {
     //    testSharedVariable();
     //    testStopThread();
     //    testDaemonThread();
-        testPriorityThread();
+    //    testPriorityThread();
+        testThirdThread();
     }
 
     /**
@@ -319,5 +330,36 @@ public class ThreadBaseTest {
             }
         }
     }
+
+    private static void testThirdThread(){
+        ThirdThread thirdThread = new ThirdThread();
+        FutureTask<String> thirdThreadFutureTask = new FutureTask<String>(thirdThread){
+            @Override
+            protected void done() {
+                super.done();
+                try {
+                    String result = get();
+                    System.out.println("result:" + result);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread thread = new Thread(thirdThreadFutureTask, "thirdThread");
+        thread.start();
+    }
+
+
+    static class ThirdThread implements Callable<String>{
+
+        @Override
+        public String call() throws Exception {
+            return "123";
+        }
+    }
+
 
 }

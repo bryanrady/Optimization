@@ -1300,9 +1300,7 @@
         5.4 线程共享变量 ThreadLocal
 
 
-六、Object对象
-
-七、反编译
+六、反编译
 
     常用工具：
     	apktool
@@ -1338,7 +1336,7 @@
     		直接查看资源与代码(不支持跳转)
 
 
-八、混淆Proguard
+七、混淆Proguard
 
         https://www.jianshu.com/p/d768f6d1d93b
 
