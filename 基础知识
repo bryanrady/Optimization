@@ -56,6 +56,7 @@
 
            如果在AndroidManifest.xml文件中设置该Activity的configChanges="orientation"时：
            竖屏切横竖：onPause()->onStop()->onDestroy()->onCreate()->onStart()->onRestart()。
+                有些手机在竖屏切横屏的时候也不会打印生命周期方法，如P30，好像和机械有关。
            横竖切竖屏：什么都不打印。
            这两次切换都会回调：onConfigurationChanged()方法。好像只要有orientation这个属性，
            就都会回调onConfigurationChanged()方法。
@@ -110,4 +111,21 @@
             例的singleTask启动模式差不多，也直接回调onIntent(),直接走该Activity的onRestart()->onStart()->onResume()。
 
             应用场景：Launcher页面、电话页面、闹钟等系统应用 。
+
+
+二、Service
+    1.定义
+        服务是一种可以在后台长时间运行而没有用户界面的应用组件。它是运行在主线程的。
+
+    2.启动服务的两种方式
+        startService()：调用者退出后服务仍然存在。只有调用stopService()服务才会退出。
+        bindService()：调用者退出后服务也会跟着退出。即不调用unbindService()服务也会自动退出。
+
+    3.Service的生命周期和启动方式有关
+        (1)只是用startService()启动服务：
+            onCreate()->onStartCommand()->onDestroy()。
+        (2)只是用bindService()启动服务：
+            onCreate()->onBind()->onUnBind()->onDestroy()。
+
+
 

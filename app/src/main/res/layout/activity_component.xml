@@ -5,68 +5,53 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="leaked"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="内存泄漏测试" />
-
-    <Button
-        android:onClick="shake"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="内存抖动测试" />
-
-    <Button
-        android:onClick="wheel_play"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="轮播" />
-
-    <Button
-        android:onClick="bitmap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Bitmap" />
-
-    <Button
-        android:onClick="battery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="耗电测试" />
-
-    <Button
-        android:onClick="handler"
+        android:onClick="activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="Handler" />
+        android:text="Activity" />
 
     <Button
-        android:onClick="component"
+        android:onClick="service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="应用组件" />
+        android:text="Service" />
+
+    <Button
+        android:onClick="receiver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAllCaps="false"
+        android:text="BroadcastReceiver" />
+
+    <Button
+        android:onClick="provider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAllCaps="false"
+        android:text="ContentProvider" />
+
+    <Button
+        android:onClick="fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAllCaps="false"
+        android:text="Fragment" />
 
 </LinearLayout>

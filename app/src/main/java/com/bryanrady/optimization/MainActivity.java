@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
+import com.bryanrady.optimization.base.component.ComponentActivity;
 import com.bryanrady.optimization.base.component.activity.FirstActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
 import com.bryanrady.optimization.bean.Student;
@@ -64,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void test(View view) {
-        Intent intent = new Intent(this, FirstActivity.class);
+    public void component(View view) {
+        Intent intent = new Intent(this, ComponentActivity.class);
         startActivity(intent);
     }
 
