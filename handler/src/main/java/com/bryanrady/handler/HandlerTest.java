@@ -79,7 +79,7 @@ public class HandlerTest {
         HandlerThread handlerThread = new HandlerThread("handleThread");
         handlerThread.start();
 
-        Handler handler = new Handler(handlerThread.getLooper()){
+        final Handler handler = new Handler(handlerThread.getLooper()){
             @Override
             public void handleMessage(Message msg) {
                 System.out.println(Thread.currentThread().getName() + " : receive message : " + msg.obj);
@@ -87,9 +87,19 @@ public class HandlerTest {
         };
 
         Message msg = handler.obtainMessage();
-        msg .obj = "java android";
+        msg .obj = "i am from main thread";
         handler.sendMessage(msg);
         System.out.println(Thread.currentThread().getName() + " : send message :" + msg .obj);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Message msg = handler.obtainMessage();
+                msg .obj = "i am from thread11";
+                handler.sendMessage(msg);
+                System.out.println(Thread.currentThread().getName() + " : send message :" + msg .obj);
+            }
+        }).start();
 
         //拿到HandlerThread的Looper 然后退出
         final Looper looper = handlerThread.getLooper();

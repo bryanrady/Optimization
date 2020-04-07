@@ -58,6 +58,8 @@
            竖屏切横竖：onPause()->onStop()->onDestroy()->onCreate()->onStart()->onRestart()。
                 有些手机在竖屏切横屏的时候也不会打印生命周期方法，如P30，好像和机械有关。
            横竖切竖屏：什么都不打印。
+
+           设置configChanges属性的目的是为了在切屏时不让Activity进行销毁和重建。
            这两次切换都会回调：onConfigurationChanged()方法。好像只要有orientation这个属性，
            就都会回调onConfigurationChanged()方法。
 
@@ -115,7 +117,8 @@
 
 二、Service
     1.定义
-        服务是一种可以在后台长时间运行而没有用户界面的应用组件。它是运行在主线程的。
+        服务是一种可以在后台长时间运行而没有用户界面的应用组件，除非系统必须回收内存资源，否则系统不会停止或销毁服务。
+        它是运行在主线程的。
 
     2.启动服务的两种方式
         startService()：调用者退出后服务仍然存在。只有调用stopService()服务才会退出。
@@ -127,5 +130,66 @@
         (2)只是用bindService()启动服务：
             onCreate()->onBind()->onUnBind()->onDestroy()。
 
+    4.Service如何与Activity进行通信？
+        (1)在Service中添加一个继承自Binder的内部类，并在内部类中添加相应的逻辑方法；然后在Service中的onBind()返回内部类
+            Binder的实例；重写onServiceConnected()、onServiceDisconnected()方法时调用逻辑方法。
+        (2)通过自定义接口进行交互。
+        (3)通过BroadcastReceiver广播方式实现组件间的通信。
+        (4)通过信使Messenger。
 
+    5.Service中可以执行耗时操作吗？
+        如果没有指定Service所运行的进程，Service和Activity一样都是默认运行在当前应用主线程的，它并不是创建了一个新的进程
+        或创建了一个新的线程，它是依赖于应用程序主线程的，所以我们不能在Service中执行耗时操作，否则可能会引起ANR。
+        如果我们需要在Service中执行耗时操作：
+        (1)通过开启线程方式来执行。
+        (2)使用AsyncTask异步任务。
+        (3)使用IntentService异步管理服务。
 
+    6.Service的onStartCommand()方法有几种返回值？
+        (1)START_STICKY
+            "粘性的"。如果Service被kill掉，保留Service的状态为开始状态，但不保留传递的Intent对象。随后系统会尝试重新创建
+            Service,由于Service状态为开始状态，所以创建服务后一定会调用onStartCommand(Intent,int,int)方法，如果在此期间没有
+            任何启动命令被传递到Service,那么参数 Intent 将为 null。
+        (2)START_NOT_STICKY
+            非粘性的。使用这个返回值时,如果在执行完 onStartCommand()后,服务被异常 kill 掉,系统不会自动重启该服务。
+        (3)START_REDELIVER_INTENT
+            重传 Intent。使用这个返回值时,如果在执行完 onStartCommand()后,服务被异常 kill 掉,系统会自动重启该服务,
+            并将参数 Intent 的值传入。
+        (4)START_STICKY_COMPATIBILITY
+            START_STICKY 的兼容版本,但不保证服务被 kill 后一定能重启。
+
+    7.Service 的 onRebind()方法在什么情况下会执行?
+        如果在onUnbind()中返回true，onRebind()就会执行，否则不会执行。
+
+    8.能在Service中弹吐司Toast么？
+        可以。弹吐司需要的一个重要参数就是context，而Service本身就是Context的子类，所以在Service中弹吐司是没有任何问题的。
+
+    9.一般会在什么情况下用到Service？
+        一般长期在后台工作的任务都需要放到Service中去做。比如音乐播放、文件下载、大文件上传、定时关闭应用等功能，如果我们
+        将这些功能放到Activity中去做，可能会因为Activity的生命周期导致这些功能不能实现。总的来说就是我们在Activity不能满足
+        需求的情况下我们会考虑使用到Service。
+
+    10.Activity如何与Service进行绑定，怎么在Activity中启动对应的Service？
+        Activity通过bindService()方法跟Service来进行绑定，当绑定成功的时候Service会将代理对象通过接口回调给conn，这样我们就
+        拿到了Service提供的服务代理对象。
+        在Activity中可以通过startService()和bindService()启动服务。如果我们想获取Service的代理对象那么只能通过bindService()；
+        如果仅仅是为了开启一个后台任务那么可以直接使用startService()。
+
+    11.什么是IntentService？
+        IntentService是Service的子类，是一个异步的，会自动停止的服务，很好解决了传统的Service中处理完耗时操作忘记停止并销毁
+        Service的问题。
+
+        源码分析：
+        看了源码才知道，就是让用户可以在Service中进行的耗时操作而生的。IntentService继承了Service，并且在onCreate()方法中
+        根据构造函数传进来的名字通过HandlerThread创建了线程，然后从HandlerThread中拿到当前线程的Looper，创建相应现场的对应
+        的Handler。onStart()方法原来在Service中是在onStartCommand()方法中进行调用的，并且是空实现的方法。而在IntentService
+        中重写了onStart()方法，并且通过Handler发送了一条带有onStart()方法中所有参数的消息，然后在自定义Handler的handleMessage()
+        方法中处理消息，最后都统一由onHandlerIntent来进行处理，然后通过stopSelf停止处理完了的服务。
+
+        还有一点，IntentService最好不要通过bindService来绑定服务，因为IntentService中onBind()是默认返回null，如果你执意要
+        bindService() 来启动 IntentService，可能因为你想通过 Binder 或 Messenger 使得 IntentService 和 Activity 可以通信，
+        这样那么 onHandleIntent() 不会被回调，相当于在你使用 Service 而不是 IntentService。
+
+    12. IntentService和Service相比有什么优点？
+        (1)会创建独立的进程来处理所有的intent请求。
+        (2)

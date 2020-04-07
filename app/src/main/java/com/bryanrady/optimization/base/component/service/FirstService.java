@@ -14,11 +14,46 @@ import androidx.annotation.Nullable;
  */
 public class FirstService extends Service {
 
-    public class FirstBinder extends Binder{
+    public class FirstBinder extends Binder implements IService{
 
-        public void callService() {
-            Log.d("wangqingbin","Service callService........");
+        public void callMethod1() {
+            method1();
         }
+
+        public void callMethod2() {
+            method2();
+        }
+
+        @Override
+        public void callMethod3() {
+            method3();
+        }
+
+        @Override
+        public void callMethod4() {
+            method4();
+        }
+    }
+
+    private void method1(){
+        Log.d("wangqingbin","Service method1 执行........");
+    }
+
+    private void method2(){
+        Log.d("wangqingbin","Service method2 执行........");
+    }
+
+    private void method3(){
+        Log.d("wangqingbin","Service method3 执行........");
+    }
+
+    private void method4(){
+        Log.d("wangqingbin","Service method4 执行........");
+    }
+
+    public interface IService{
+        void callMethod3();
+        void callMethod4();
     }
 
     @Override
@@ -44,6 +79,10 @@ public class FirstService extends Service {
         return new FirstBinder();
     }
 
+    /**
+     * 只有onUnbind()返回true的情况下，onRebind()才会执行，否则不会执行。
+     * @param intent
+     */
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
@@ -59,6 +98,7 @@ public class FirstService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    //    stopSelf();
         Log.d("wangqingbin","Service onDestroy........");
     }
 

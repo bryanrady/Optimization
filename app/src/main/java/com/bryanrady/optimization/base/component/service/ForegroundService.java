@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.bryanrady.optimization.R;
 
@@ -19,22 +20,57 @@ import androidx.core.app.NotificationCompat;
 
 /**
  * 前台服务
- * https://mp.weixin.qq.com/s?src=11&timestamp=1585814540&ver=2253&signature=LwJSqaiqCN2uyoftcMIU5NOW8Qhq0kN1sDd48ijDjwG7HxFICZLzEU4JmSdSsbNEb2o9IXMVCBOee0VCpJ4w3NefblNl7pk9nGak3h-6-lriblL1jQyibhbsplqrEH*M&new=1
  * @author: wangqingbin
  * @date: 2020/4/2 15:29
  */
 public class ForegroundService extends Service {
 
-    private final int NotificationID = 0x10000;
+    private final int NOTIFICATION_ID = 0x10000;
+    private static boolean mServiceIsLive = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("wangqingbin","onCreate.....");
+        //启动服务的时候，创建通知
+        Notification notification = createForegroundNotification();
+        startForeground(NOTIFICATION_ID, notification);
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("wangqingbin","onStartCommand.....");
+        mServiceIsLive = true;
+        //intent参数获取
+        String foreground = intent.getStringExtra("foreground");
+        Log.d("wangqingbin","foreground == " + foreground);
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d("wangqingbin","onBind.....");
+        return null;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d("wangqingbin","onUnbind.....");
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("wangqingbin","onDestroy.....");
+        super.onDestroy();
+        mServiceIsLive = false;
+        //关闭前台服务并移除通知
+        stopForeground(true);
     }
 
     /**
-     * 创建服务通知
+     * 创建服务通知内容，例如音乐播放，蓝牙设备正在连接等
      * @return
      */
     private Notification createForegroundNotification(){
@@ -69,31 +105,12 @@ public class ForegroundService extends Service {
         builder.setWhen(System.currentTimeMillis());
         //设定启动的内容
         Intent activityIntent = new Intent(this, ComponentActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, activityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1,
+                activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         //创建通知并返回
         return builder.build();
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 }
+
