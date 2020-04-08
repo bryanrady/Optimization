@@ -60,6 +60,16 @@
         android:text="Handler" />
 
     <Button
+        android:onClick="keep_alive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAllCaps="false"
+        android:text="进程保活" />
+
+    <Button
         android:onClick="component"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

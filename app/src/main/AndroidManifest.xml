@@ -75,6 +75,11 @@
         <activity android:name=".handler.HandlerThreadActivity"/>
         <activity android:name=".handler.IdleHandlerActivity"/>
 
+        <activity android:name=".alive.activity.KeepAliveActivity"
+            android:excludeFromRecents="true"
+            android:taskAffinity="com.bryanrady.optimization.keep"
+            android:theme="@style/KeepAliveTheme" />
+
         <activity android:name=".base.component.ComponentActivity" />
         <activity android:name=".base.component.activity.FirstActivity"
             android:configChanges="orientation"/>
@@ -96,10 +101,16 @@
 
         <service android:name=".base.component.service.MyIntentService"/>
 
-
-
-
-
+        <receiver android:name=".base.component.receiver.FirstBroadcastReceiver">
+            <intent-filter>
+                <action android:name="first_action" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".base.component.TestBroadcastReceiver">
+            <intent-filter>
+                <action android:name="test_action" />
+            </intent-filter>
+        </receiver>
 
 
 

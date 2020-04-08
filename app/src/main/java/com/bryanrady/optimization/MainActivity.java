@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
+import com.bryanrady.optimization.alive.activity.KeepAliveManager;
 import com.bryanrady.optimization.base.component.ComponentActivity;
 import com.bryanrady.optimization.base.component.activity.FirstActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
@@ -70,9 +71,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void keep_alive(View view) {
+        //通过Activity提权提高进程优先级提高进程保活概率
+        KeepAliveManager.getInstance().registerKeepAliveReceiver(this);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        KeepAliveManager.getInstance().unregisterKeepAliveReceiver(this);
+
         //华为手机引发的泄漏
         FixLeakedUtils.fixInputMethodManagerLastSrvView(this);
         FixLeakedUtils.fixInputMethodManagerLeak(this);
