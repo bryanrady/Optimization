@@ -190,6 +190,18 @@
         bindService() 来启动 IntentService，可能因为你想通过 Binder 或 Messenger 使得 IntentService 和 Activity 可以通信，
         这样那么 onHandleIntent() 不会被回调，相当于在你使用 Service 而不是 IntentService。
 
-    12. IntentService和Service相比有什么优点？
-        (1)会创建独立的进程来处理所有的intent请求。
-        (2)
+    12.IntentService和Service相比有什么优点？
+        (1)我们不用在Service中手动开启线程，IntentService内部的onCreate()就已经通过HandlerThread默认开启了线程。
+        (2)当操作完成后，我们不用手动的去停止Service。IntentService内部的Handler的handleMessage()方法中，当onHandleIntent()
+            处理完成后，IntentService会调用stopSelf()自动停止服务。
+
+    13.如何提高Service的优先级？(也就是让Service存活率变高)
+        (1)在AndroidManifest.xml文件中对于intent-filter可以通过android:priority = “1000”这个属性设置最高优先级，1000是最高值，
+            如果数字越小则优先级越低，同时实用于广播。
+        (2)在onStartCommand() 里面调用 startForeground()方法把Service提升为前台进程级别，然后再onDestroy()里面要记得调用
+            stopForeground()方法。
+        (3)在onStartCommand方法，手动返回START_STICKY。当服务被异常kill掉，系统会尝试重启服务。
+        (4)在Service的onDestroy()方法里发广播重启Service。
+        (5)监听系统广播判断Service状态。比如手机重启、界面唤醒、应用状态改变等等监听并捕获到，然后判断我们的Service是否还存活。
+        (6)Application加上Persistent属性。
+

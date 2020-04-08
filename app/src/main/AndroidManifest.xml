@@ -94,8 +94,7 @@
 
         <service android:name=".base.component.service.ForegroundService"/>
 
-
-
+        <service android:name=".base.component.service.MyIntentService"/>
 
 
 
