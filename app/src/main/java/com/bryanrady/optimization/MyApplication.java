@@ -31,10 +31,10 @@ public class MyApplication extends Application {
         mContext = this;
         initThirdSdk();
 
-        if (!TextUtils.equals(BuildConfig.APPLICATION_ID + ":location", getProcessName(Process.myPid()))) {
-            location = new Intent(this, LocationService.class);
-            startService(location);
-        }
+//        if (!TextUtils.equals(BuildConfig.APPLICATION_ID + ":location", getProcessName(Process.myPid()))) {
+//            location = new Intent(this, LocationService.class);
+//            startService(location);
+//        }
     }
 
     private void initThirdSdk() {

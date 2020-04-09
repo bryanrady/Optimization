@@ -11,6 +11,7 @@ import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class ReceiverActivity extends AppCompatActivity {
 
@@ -20,6 +21,7 @@ public class ReceiverActivity extends AppCompatActivity {
     private DynamicBroadcastReceiver mDynamicReceiver;
     private MyBroadcastReceiver mMyReceiver;
     private MyBroadcastReceiver2 mMyReceiver2;
+    private PermissionBroadcastReceiver mPermissionReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,13 @@ public class ReceiverActivity extends AppCompatActivity {
         filter3.addAction(DYNAMIC_ACTION);
         filter3.setPriority(999);
         registerReceiver(mMyReceiver2, filter3);
+
+        mPermissionReceiver = new PermissionBroadcastReceiver();
+        IntentFilter filter4 = new IntentFilter();
+        filter4.addAction("custom_action");
+        registerReceiver(mPermissionReceiver, filter4,
+                "com.bryanrady.custom.BroadcastReceiver", null);
+
     }
 
     @Override
@@ -59,6 +68,9 @@ public class ReceiverActivity extends AppCompatActivity {
         }
         if (mMyReceiver2 != null){
             unregisterReceiver(mMyReceiver2);
+        }
+        if (mPermissionReceiver != null){
+            unregisterReceiver(mPermissionReceiver);
         }
     }
 
@@ -97,7 +109,6 @@ public class ReceiverActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
-
     public void static_order_register(View view) {
         Intent intent = new Intent();
         intent.setAction(STATIC_ACTION);
@@ -113,4 +124,10 @@ public class ReceiverActivity extends AppCompatActivity {
         sendOrderedBroadcast(intent, null);
     }
 
+    public void send_permission(View view) {
+        Intent intent = new Intent();
+        intent.setAction("custom_action");
+        intent.putExtra("data", "这是ReceiverActivity页面发送的动态注册的带有权限的无序广播");
+        sendBroadcast(intent, "com.bryanrady.custom.BroadcastReceiver");
+    }
 }

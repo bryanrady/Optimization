@@ -2,6 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.bryanrady.tinker">
 
+    <!-- 声明自定义权限    app工程自定义了这个权限 -->
+    <uses-permission android:name="com.bryanrady.custom.BroadcastReceiver"/>
+
     <application
         android:name=".TinkerApplication"
         android:allowBackup="true"

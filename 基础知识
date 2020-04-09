@@ -216,3 +216,107 @@
             在AndroidManifest.xml文件中进行注册。
         (2)动态注册
             动态注册需要在java代码中动态的指定广播并进行注册。动态注册要记得反注册。
+
+        两种注册方式的区别：
+            静态注册：BroadcastReceiver注册后常驻后台，不会随着其他组件的消亡而变化，即使应用被杀死了还是可以接收到广播。
+                    这样的话不仅占用内存，而且会增加应用的耗电量。
+
+            动态注册：BroadcastReceiver注册跟随组件的生命周期而产生变化，注册和注销的过程需要开发者自己手动完成，生命周期
+                    灵活可控。一般在组件销毁时进行反注册。
+
+        作为开发者必须要知道的是，随着Android系统的不断更新迭代，广播的发布规则也发生了一些变化。
+
+        在Android 7.0(API 24)及以上的版本，将不再使用系统广播中的 ACTION_NEW_PICTURE和ACTION_NEW_VIDEO。
+        在Android 7.0(API 24)及以上的版本，监听CONNECTIVITY_ACTION广播时，需要动态注册。
+        从Android 8.0(API 26)开始，对于大部分隐式广播，不能在Manifest中声明receiver，如果需要使用隐式广播，需要使用动态注册。
+        也可以在静态注册的基础上在发送广播的时候添加一些属性变成显式的广播，不过最好还是用动态注册。
+
+    3.BroadcastReceiver的使用场景
+        (1)同一应用中组件之间的通信。
+        (2)不同应用中组件之间的通信。
+        (3)系统与应用之间的通信。
+
+    4.BroadcastReceiver的种类
+        (1)普通广播
+            广播被发送后，BroadcastReceiver之间是无顺序，完全异步的，各个Receiver之间无关联。无序广播无法通过abortBroadcast终止，
+            也无法使用setResult和getResult来传递处理结果。
+
+        (2)有序广播
+            广播发送后会按照优先级顺序被不同的广播接收器接收，优先级可以通过intent-filter的android:priority属性来设置，定义范围为-1000~1000，
+            数值越大，优先级越高（如果优先级相同，1. 发送广播的进程会优先接收 2. 先注册的Receiver先接收）。有序广播发送后，会被优先级最高的
+            BroadCastReceiver接收，然后在处理完毕后依次被优先级较低的BroadCastReceiver接收，期间，BroadCastReceiver可以设置setResult将该广播
+            的处理结果传递给下一个BroadCastReceiver，下一个Receiver通过getResult获取。有序广播被接收时，还可以通过abortBroadcast来终止，终止
+            后，广播不会继续传递给其他Receiver。如：开发一个拦截短信的功能，我们将priority设置为1000，来最大限度的保证短信可以被我们的Receiver
+            接收，在接收后，如果不想短信显示在系统短信列表中，我们可以abortBroadcast来终止传递，此时也就不会有短信提示音，也不会再短信收件箱中
+            看到该短信。
+
+        (3)粘性广播(基本废弃)。
+            它与非粘性广播的区别是，在onReceiver中粘性广播不受10s限制（普通广播onReceiver在10s未处理完毕，会抛出ANR），粘性广播在10s后仍然存在，
+            直至广播处理完毕。但需要注意的是，10s后，系统会将这个广播置为candidate状态，即可以被干掉的，当系统资源不足时，广播仍然可能会被丢弃。
+            使用粘性广播需要android.Manifest.permission.BROADCAST_STICKY权限
+
+        (4)本地广播(LocalBroadcastManager)
+
+    5.BroadcastReceiver的实现机制
+        Android中的广播使用了观察者模式：基于消息发布/订阅模式的事件驱动模型。
+        广播模型中包含三个角色：
+            消息发布者（广播发布者）
+            消息中心（AMS，即Activity Manager Service）
+            消息订阅者（广播接收者）
+        (1)广播接受者通过Binder机制在AMS中注册监听
+        (2)广播发布者通过Binder机制向AMS发送广播
+        (3)AMS根据发送者的需求，在已注册表中获取到合适的广播接受者（根据Intent-filter，Permission）
+        (4)AMS将广播发送给合适的广播接受者的消息循环队列中
+        (5)广播接收者通过消息循环获取到广播并回调onReceive()
+
+        整个广播发送与接收过程中，发送者与接收者是异步的，发送者不需要知道是否有接受者，也不需要知道接受者何时收到广播。
+
+    6.LocalBroadcastManager的实现原理
+        LocalBroadcastManager虽然使用和普通广播没有太大差别，但是原理却是完全不同。LocalBroadcastManager内部维护了
+        mReceivers和mActions两个HashMap。
+        mReceivers： 是接收器和IntentFilter的对应表，主要作用是方便在unregisterReceiver(…)取消注册，同时作为对象锁限
+                     制注册接收器、发送广播、取消接收器注册等几个过程的并发访问。
+
+        mActions： 以Action为 key，注册这个Action的BroadcastReceiver链表为 value。mActions 的主要作用是方便在广播发送
+                    后快速得到可以接收它的BroadcastReceiver。
+
+        在注册广播时，其实是在更新这两个Map。发送广播时，根据Action从mActions中取出ReceiverRecord列表，找出action匹配的广播，
+        然后通过Handler发送消息，在Handler的handleMessage中，取出匹配的广播列表，依次回调onReceive方法。
+
+    7.LocalBroadcastManager特点
+        (1)本地广播只能在自身App内传播，不必担心泄漏隐私数据。
+        (2)本地广播不允许其他App对你的App发送该广播，不必担心安全漏洞被利用。
+        (3)本地广播比全局广播更高效。
+
+    8. 发送的广播如果只想让指定的广播接收者接收，或者只想接收指定发送者发送的广播，这些该如何实现呢？
+       如何发送给指定的广播接受者？
+       (1)在发送者的AndroidManifest.xml文件中定义自定义权限；
+       (2)在发送者发送广播的时候添加这个自定义权限。
+       (3)在接收者的AndroidManifest.xml文件中声明这个自定义权限。
+
+      这样一来就只有在广播接收者的应用中在AndroidManifest.xml中添加对应的权限，才能正常接收到该广播。
+
+       如何接收指定发送者的广播？
+       (1)在接收者的AndroidManifest.xml文件中定义自定义权限；
+       (2)在接收者注册广播的时候添加这个自定义权限。
+       (3)在发送者者的AndroidManifest.xml文件中声明这个自定义权限。
+
+      这样一来接收者就只能接收来自具有该权限的应用发出的广播。要发送该广播，只需在发送者的AndroidManifest.xml中
+      也声明使用该权限即可。
+
+      说来说去就是通过自定义权限来控制广播的安全性问题。
+
+    9. 注意事项
+        (1)动态注册的广播，在不需要使用时或者载体即将销毁时进行注销，即每一个registerReceiver需要有一个对应的unregisterReceiver。
+        (2)不要在广播接收器onReceive()中进行耗时操作，否则会引起ANR(10s)。
+        (3)不要在广播接收器onReceive()中开启异步任务，否则因为其生命周期的结束会出现空线程，导致任务丢失或者出现ANR等情况。
+        (4)耗时任务请开启service进行处理，且应当使用startService，而不应该使用bindService。因为onReceive()传下来的context是经过
+            封装的context。
+        (5)应用内的广播尽量使用LocalBroadcastManager，因为其使用Handler，较Broadcast的Binder机制开销更小，且安全性更高。
+        (6)动态注册的广播优先度比静态注册高（当配置的优先级一致时），且可以控制其注册与注销，开销更小，所以能满足功能的情况下优先
+            使用动态注册如果接受不到自己发送的广播，请注意是否是因为权限问题。
+
+
+四、ContentProvider
+    1.定义
+        Android提供的专门用于不同应用间数据交互和共享的组件。

@@ -36,8 +36,18 @@
     <uses-permission android:name="com.bryanrady.custom.BroadcastReceiver"/>
 
     <!-- 自定义一个权限 -->
-    <permission android:name="com.bryanrady.custom.BroadcastReceiver"
-        android:protectionLevel="signature" />
+    <permission android:name="com.bryanrady.custom.BroadcastReceiver" />
+    <!--
+        在自定义权限时，通常会指定protectionLevel属性，常用的如下：
+
+        normal：默认的，应用安装前，用户可以看到相应的权限，但无需用户主动授权。
+
+        dangerous：normal安全级别控制以外的任何危险操作。需要dangerous级别权限时，Android会明确要求用户进行授权。
+                    常见的如：网络使用权限，相机使用权限及联系人信息使用权限等。
+
+        signature：它要求权限声明应用和权限使用应用使用相同的keystore进行签名。如果使用同一keystore，则该权限由系统授予，
+                    否则系统会拒绝。并且权限授予时，不会通知用户。它常用于应用内部
+     -->
 
     <application
         android:name=".MyApplication"
@@ -137,9 +147,6 @@
                 <action android:name="custom_action" />
             </intent-filter>
         </receiver>
-
-
-
 
 
 
