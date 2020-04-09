@@ -9,17 +9,15 @@ import android.util.Log;
  * @author: wangqingbin
  * @date: 2020/4/8 15:41
  */
-public class FirstBroadcastReceiver extends BroadcastReceiver {
-
-    public static final String FIRST_ACTION = "first_action";
+public class DynamicBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.e("wangqingbin","receive action: " + action);
-        if (FIRST_ACTION.equals(action)){
+        Log.e("DynamicBroadcastReceiver","receive action: " + action);
+        if (ReceiverActivity.DYNAMIC_ACTION.equals(action)){
             String data = intent.getStringExtra("data");
-            Log.e("wangqingbin","receive data: " + data);
+            Log.e("DynamicBroadcastReceiver","receive data: " + data);
         }
     }
 

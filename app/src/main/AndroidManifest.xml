@@ -32,6 +32,13 @@
     <!--前台服务的权限-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <!-- 声明这个权限 -->
+    <uses-permission android:name="com.bryanrady.custom.BroadcastReceiver"/>
+
+    <!-- 自定义一个权限 -->
+    <permission android:name="com.bryanrady.custom.BroadcastReceiver"
+        android:protectionLevel="signature" />
+
     <application
         android:name=".MyApplication"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -101,16 +108,50 @@
 
         <service android:name=".base.component.service.MyIntentService"/>
 
-        <receiver android:name=".base.component.receiver.FirstBroadcastReceiver">
+        <activity android:name=".base.component.receiver.ReceiverActivity" />
+        <receiver android:name=".base.component.receiver.StaticBroadcastReceiver">
             <intent-filter>
-                <action android:name="first_action" />
+                <action android:name="static_action" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".base.component.TestBroadcastReceiver">
-            <intent-filter>
-                <action android:name="test_action" />
+        <receiver android:name=".base.component.receiver.MyBroadcastReceiver">
+            <intent-filter android:priority="500">
+                <action android:name="static_action" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".base.component.receiver.MyBroadcastReceiver2">
+            <intent-filter android:priority="999">
+                <action android:name="static_action" />
+            </intent-filter>
+        </receiver>
+        <!-- 有权限的接收者 -->
+        <receiver android:name=".base.component.receiver.PermissionBroadcastReceiver"
+            android:permission="com.bryanrady.custom.BroadcastReceiver">
+            <intent-filter>
+                <action android:name="custom_action" />
+            </intent-filter>
+        </receiver>
+        <!-- 没有权限的接收者 -->
+        <receiver android:name=".base.component.receiver.NonPermissionBroadcastReceiver">
+            <intent-filter>
+                <action android:name="custom_action" />
+            </intent-filter>
+        </receiver>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- ******************************************************************** -->
 
 
 
