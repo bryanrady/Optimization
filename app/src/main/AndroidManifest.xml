@@ -97,6 +97,8 @@
             android:taskAffinity="com.bryanrady.optimization.keep"
             android:theme="@style/KeepAliveTheme" />
 
+        <activity android:name=".base.BasicActivity" />
+
         <activity android:name=".base.component.ComponentActivity" />
         <activity android:name=".base.component.activity.FirstActivity"
             android:configChanges="orientation"/>
@@ -148,14 +150,14 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".base.component.provider.ProviderActivity" />
+        <provider
+            android:name=".base.component.provider.MyProvider"
+            android:authorities="com.bryanrady.optimization.MyProvider"
+            android:exported="true">
+        </provider>
 
-
-
-
-
-
-
-
+        <activity android:name=".base.fragment.FragmentStaticUseActivity" />
 
 
         <!-- ******************************************************************** -->

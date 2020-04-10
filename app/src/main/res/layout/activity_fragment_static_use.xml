@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <fragment
+        android:id="@+id/id_fragment_title"
+        android:name="com.bryanrady.optimization.base.fragment.TitleFragment"
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
+
+    <fragment
+        android:id="@+id/id_fragment_content"
+        android:layout_below="@id/id_fragment_title"
+        android:name="com.bryanrady.optimization.base.fragment.ContentFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

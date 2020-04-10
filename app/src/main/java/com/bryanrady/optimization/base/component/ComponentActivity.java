@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.base.component.activity.FirstActivity;
+import com.bryanrady.optimization.base.component.provider.ProviderActivity;
 import com.bryanrady.optimization.base.component.receiver.ReceiverActivity;
 import com.bryanrady.optimization.base.component.service.FirstService;
 import com.bryanrady.optimization.base.component.service.ForegroundService;
@@ -123,11 +124,8 @@ public class ComponentActivity extends AppCompatActivity {
     }
 
     public void provider(View view) {
-
-    }
-
-    public void fragment(View view) {
-
+        Intent intent = new Intent(this, ProviderActivity.class);
+        startActivity(intent);
     }
 
     @Override

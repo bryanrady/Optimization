@@ -5,43 +5,33 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="activity"
+        android:onClick="component"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="Activity" />
+        android:text="组件" />
 
     <Button
-        android:onClick="service"
+        android:onClick="fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="Service" />
+        android:text="Fragment" />
 
     <Button
-        android:onClick="receiver"
+        android:onClick="view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="BroadcastReceiver" />
-
-    <Button
-        android:onClick="provider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="ContentProvider" />
+        android:text="View" />
 
 </LinearLayout>

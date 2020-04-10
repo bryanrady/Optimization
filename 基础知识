@@ -319,4 +319,79 @@
 
 四、ContentProvider
     1.定义
-        Android提供的专门用于不同应用间数据交互和共享的组件。
+        主要用于在不同的应用程序之间实现数据共享的组件，它提供了一套完整的机制，允许一个程序访问另一个程序中的数据，同时还能保证
+        被访数据的安全性。
+
+    2.Uri
+        统一资源标识符，用来标识ContentProvider的数据，外界进程通过Uri找到对应的ContentProvider和其中的数据，再进行数据操作。
+
+        自定义Uri： "content://com.bryanrady.optimization.MyProvider/user/1"
+
+        这个Uri指向的资源是：
+            名为 "com.bryanrady.optimization.MyProvider" 的ContentProvider中表名为user中的id为1的数据。如果没有后面的id，则指向
+            user表中的所有数据。
+
+
+        自定义Uri： schema + authorities + path + id
+
+        schema:         content://
+        authorities:    com.bryanrady.optimization.MyProvider
+        path:           /user
+        id :            1
+
+        特别注意：URI模式存在匹配通配符 * ＃
+
+        *   匹配任意长度的任何有效字符的字符串
+            content://com.bryanrady.optimization.MyProvider/*
+            表示匹配这个provider中的的任何内容
+
+        ＃  匹配任意长度的数字字符的字符串
+            content://com.bryanrady.optimization.MyProvider/#
+            表示匹配这个provider中任意长度的数字字符的字符串
+
+    3.为什么要设计ContentProvider这个组件？
+        (1)封装。对数据进行封装，暴露统一的接口，使用者不必不必关心这些数据是在 DB ，XML 、Preferences 或者网络请求来的。当项目
+            需求要改变数据来源时，使用的地方完全不需要修改。
+        (2)跨进程共享数据。
+        (3)数据通知更新机制。因为数据是在多个应用程序中共享的，当其中一个应用程序改变了这些共享数据的时候，它有责任通知其它应用
+            程序，让它们知道共享数据被修改了，这样它们就可以作相应的处理。
+
+    4.如何访问自定义的ContentProvider？
+        通过ContentResolver来访问ContentProvider的数据，ContentResolver通过Context的getContentResolver()获得，然后根据ContentProvider
+        暴露的Uri调用ContentResolver接口相应的CRUD方法，就可以调用到ContentProvider相应的CRUD方法并得到结果。
+
+    5.ContentProvider和Sqlite有什么区别？
+        (1)ContentProvider屏蔽了数据存储的细节，内部实现对用户完全透明，用户只需要关心操作数据的 uri 就可以了。
+        (2)ContentProvider可以实现不同应用程序之间的共享。Sql虽然也有增删改查的方法, 但是sql只能查询本应用下的数据库。
+        (3)ContentProvider 还可以去增删改查本地文件、xml文件的读取等。
+
+    6.运行在主线程的 ContentProvider 为什么不会影响主线程的 UI 操作?
+        ContentProvider 的 onCreate() 是运行在 UI 线程的，而 query() ，insert() ，delete() ，update() 是运行在线程池中的工作线程
+        的，所以调用这向个方法并不会阻塞 ContentProvider 所在进程的主线程，但可能会阻塞调用者所在的进程的 UI 线程。
+        所以，调用 ContentProvider 的操作仍然要放在子线程中去做。虽然直接的 CRUD 的操作是在工作线程的，但系统会让你的调用线程等
+        待这个异步的操作完成，你才可以继续线程之前的工作。
+
+五、Fragment
+
+    1.定义
+        Fragment 表示 Activity 中的行为或用户界面部分。您可以将多个片段组合在一个 Activity 中来构建多窗格 UI，以及在多个 Activity
+        中重复使用某个片段。您可以将片段视为 Activity 的模块化组成部分，它具有自己的生命周期，能接收自己的输入事件，并且您可以在
+        Activity 运行时添加或移除片段（有点像您可以在不同 Activity 中重复使用的“子 Activity”）。
+
+    2.Fragment的生命周期
+        onAttach()、onCreate()、onCreateView()、onActivityCreated()
+        onStart()
+        onResume()
+        onPause()
+        onStop()
+        onDestroyView()、onDestroy()、onDetach()
+
+        onAttach(Activity)：当Fragment与Activity发生关联时调用。与onDetach()相对应。
+        onCreate()：        当Fragment创建的时候调用。与onDestroy()相对应。
+        onCreateView()：    当Fragment创建视图的时候调用。与onDestroyView()相对应。
+        onActivityCreated():当Activity的onCreate()回调的时候调用。
+
+        注意：除了onCreateView()，其他的所有方法如果你重写了，必须调用父类对于该方法的实现，
+
+    3.Fragment的使用
+

@@ -11,7 +11,6 @@ import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.leaked.FixLeakedUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class ReceiverActivity extends AppCompatActivity {
 

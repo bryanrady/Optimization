@@ -5,43 +5,39 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="activity"
+        android:onClick="provider_insert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="Activity" />
+        android:text="添加" />
 
     <Button
-        android:onClick="service"
+        android:onClick="provider_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="Service" />
+        android:text="删除" />
 
     <Button
-        android:onClick="receiver"
+        android:onClick="provider_update"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="BroadcastReceiver" />
+        android:text="修改" />
 
     <Button
-        android:onClick="provider"
+        android:onClick="provider_query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:textAllCaps="false"
-        android:text="ContentProvider" />
+        android:text="查询" />
 
 </LinearLayout>

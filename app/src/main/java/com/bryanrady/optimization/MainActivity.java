@@ -8,8 +8,7 @@ import android.view.View;
 
 import com.bryanrady.optimization.advertisement.PlayerActivity;
 import com.bryanrady.optimization.alive.activity.KeepAliveManager;
-import com.bryanrady.optimization.base.component.ComponentActivity;
-import com.bryanrady.optimization.base.component.activity.FirstActivity;
+import com.bryanrady.optimization.base.BasicActivity;
 import com.bryanrady.optimization.battery.BatteryActivity;
 import com.bryanrady.optimization.bean.Student;
 import com.bryanrady.optimization.bean.Student2;
@@ -66,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void component(View view) {
-        Intent intent = new Intent(this, ComponentActivity.class);
-        startActivity(intent);
-    }
-
     public void keep_alive(View view) {
         //通过Activity提权提高进程优先级提高进程保活概率
         KeepAliveManager.getInstance().registerKeepAliveReceiver(this);
+    }
+
+    public void basic(View view) {
+        Intent intent = new Intent(this, BasicActivity.class);
+        startActivity(intent);
     }
 
     @Override
