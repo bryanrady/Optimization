@@ -157,8 +157,10 @@
             android:exported="true">
         </provider>
 
+        <activity android:name=".base.fragment.FragmentUseActivity" />
         <activity android:name=".base.fragment.FragmentStaticUseActivity" />
-
+        <activity android:name=".base.fragment.FragmentDynamicUseActivity" />
+        <activity android:name=".base.fragment.FragmentBackStackActivity" />
 
         <!-- ******************************************************************** -->
 

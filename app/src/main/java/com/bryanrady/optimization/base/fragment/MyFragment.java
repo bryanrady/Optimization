@@ -6,17 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bryanrady.optimization.R;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bryanrady.optimization.R;
 
 /**
  * @author: wangqingbin
  * @date: 2020/4/10 15:43
  */
-public class ContentFragment extends Fragment {
+public class MyFragment extends Fragment {
 
     @Nullable
     @Override
@@ -28,7 +28,7 @@ public class ContentFragment extends Fragment {
 
     private void initView(View view){
         TextView tvContent = view.findViewById(R.id.tv_content);
-        tvContent.setText("使用Fragment做主面板");
+        tvContent.setText("使用Fragment做我的主页");
     }
 
 }

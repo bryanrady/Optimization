@@ -9,9 +9,9 @@
         android:layout_height="45dp" />
 
     <FrameLayout
-        android:id="@+id/id_content"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_above="@id/ll_bottom"
         android:layout_below="@id/id_fragment_title" />
 
@@ -23,12 +23,24 @@
         android:orientation="horizontal">
         <TextView
             android:id="@+id/tv_msg"
+            android:layout_weight="1"
+            android:text="消 息"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:orientation="horizontal">
-
-        </TextView>
-
+            android:layout_height="match_parent"
+            android:background="#222222"/>
+        <TextView
+            android:id="@+id/tv_my"
+            android:layout_weight="1"
+            android:text="我 的"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#666666"/>
     </LinearLayout>
 
 </RelativeLayout>

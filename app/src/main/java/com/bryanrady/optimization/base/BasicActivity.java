@@ -7,6 +7,7 @@ import android.view.View;
 import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.base.component.ComponentActivity;
 import com.bryanrady.optimization.base.fragment.FragmentStaticUseActivity;
+import com.bryanrady.optimization.base.fragment.FragmentUseActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,7 +29,7 @@ public class BasicActivity extends AppCompatActivity {
     }
 
     public void fragment(View view) {
-        Intent intent = new Intent(this, FragmentStaticUseActivity.class);
+        Intent intent = new Intent(this, FragmentUseActivity.class);
         startActivity(intent);
     }
 
