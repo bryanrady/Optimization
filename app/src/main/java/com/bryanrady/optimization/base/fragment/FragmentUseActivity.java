@@ -35,5 +35,10 @@ public class FragmentUseActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FragmentBackStackActivity.class);
         startActivity(intent);
     }
+
+    public void configure_change(View view) {
+        Intent intent = new Intent(this, FragmentConfigureChangeActivity.class);
+        startActivity(intent);
+    }
 }
 

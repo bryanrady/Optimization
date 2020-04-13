@@ -6,6 +6,7 @@ import android.view.Window;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -16,7 +17,8 @@ import com.bryanrady.optimization.R;
  * @author: wangqingbin
  * @date: 2020/4/10 15:42
  */
-public class FragmentBackStackActivity extends AppCompatActivity{
+public class FragmentBackStackActivity extends AppCompatActivity implements FirstFragment.FirstBtnClickListener,
+        SecondFragment.SecondBtnClickListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,8 +30,14 @@ public class FragmentBackStackActivity extends AppCompatActivity{
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         FirstFragment firstFragment = new FirstFragment();
-        transaction.add(R.id.fl_content, firstFragment);
+        //设置一下回调接口
+        firstFragment.setFirstBtnClickListener(this);
+        transaction.replace(R.id.fl_content, firstFragment);
         transaction.commit();
+
+        //通过这种方式来获取Fragment实例，就可以调用Fragment的方法，不过不推荐，最好用接口方式
+        //Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        //Fragment fragment = getSupportFragmentManager().findFragmentById(id);
     }
 
     @Override
@@ -60,5 +68,15 @@ public class FragmentBackStackActivity extends AppCompatActivity{
     protected void onDestroy() {
         super.onDestroy();
         Log.d("wangqingbin","Activity onDestroy........");
+    }
+
+    @Override
+    public void onFirstBtnClick() {
+        Log.d("wangqingbin","onFirstBtnClick........");
+    }
+
+    @Override
+    public void onSecondBtnClick() {
+        Log.d("wangqingbin","onSecondBtnClick........");
     }
 }

@@ -386,12 +386,95 @@
         onStop()
         onDestroyView()、onDestroy()、onDetach()
 
-        onAttach(Activity)：当Fragment与Activity发生关联时调用。与onDetach()相对应。
-        onCreate()：        当Fragment创建的时候调用。与onDestroy()相对应。
-        onCreateView()：    当Fragment创建视图的时候调用。与onDestroyView()相对应。
-        onActivityCreated():当Activity的onCreate()回调的时候调用。
+        onAttach(Activity)： 当Fragment与Activity发生关联时调用。与onDetach()相对应。
+        onCreate()：         当Fragment创建的时候调用。与onDestroy()相对应。
+        onCreateView()：     当Fragment创建视图的时候调用。与onDestroyView()相对应。
+        onActivityCreated()：当Activity的onCreate()回调的时候调用。
 
         注意：除了onCreateView()，其他的所有方法如果你重写了，必须调用父类对于该方法的实现，
 
     3.Fragment的使用
+        (1)静态的使用Fragment
+            继承Fragment重写onCreateView()方法决定Fragment的布局，然后把自定义好的Fragment当作Activity中的控件进行使用，可以在
+            布局文件中指定,这也是最简单的使用Fragment的方式。
+        (2)动态的使用Fragment
+            动态的添加、更新以及删除Fragment，通过getSupportFragmentManager获得FragmentManager。然后再通过FragmentManager获得
+            FragmentTransaction事务，事务用来保证一些列Fragment操作的原子性，然后通过事务来进行一系列操作。
 
+            transaction.add()
+                往Activity中添加一个Fragment。
+            transaction.remove()
+                从Activity中移除一个Fragment，如果被移除的Fragment没有添加到回退栈，这个Fragment实例将会被销毁。
+            transaction.replace()
+                使用另一个Fragment替换当前的，它是remove()然后add()的合体。
+            transaction.hide()
+                隐藏当前的Fragment，仅仅是设为不可见，并不会销毁。
+            transaction.show()
+                显示之前隐藏的Fragment。
+            transaction.detach()
+                从Activity中移除Fragment的视图，和remove()不同，Fragment的实例并不会被销毁。
+            transaction.attach()
+                重新构建Fragment的视图，附加到Activity上并显示。
+            transaction.commit()
+                提交一个事务。
+
+    4.Activity向Fragment传值或者Fragment向Fragment传值？
+        在创建Fragment对象之后，通过fragment.setArguments()传递Bundle到Fragment中，Bundle中可以封装参数，然后可以在Fragment中
+        通过getArguments()得到Bundle对象，然后根据键值进行获取。
+
+    5.Activity或者Fragment调用其它Fragment的方法？
+        (1)如果Activity或者Fragment中包含其它Fragment的引用，直接通过这个引用来调用相应的方法。
+        (2)通过FragmentManager的findFragmentByTag()或者findFragmentById获取到Fragment的实例，然后根据实例调用相应的方法。
+        (3)在其它Fragment中声明接口，然后通过接口或者设置接口回调。
+
+    6.FragmentTransaction的add和replace的区别？
+        (1)add()是一层层添加上去的，通过show去显示当前界面，hide去隐藏其他的界面，这时候的FrameLayout是会有很多层的。
+            Fragment A切换到Fragment B，然后再由Fragment B切换到Fragment A的时候，Fragment A的所有生命周期是不会走的，
+            只会调用onHiddenChanged(boolean isHidden)，也就是说hide和show只是把其他界面隐藏，当前界面显示的效果，并不
+            会走生命周期方法。
+
+        (2)replace()是会替换掉原有的，所以这种方式的FrameLayout是只有一层的。Fragment A切换到Fragment B，Fragment A会
+            依次走生命周期方法：onAttach() ---> onViewCreated() ---> onActivityCreated() ---> onStart()。但是如果添加
+            transaction.addToBackStack(null)，生命周期方法onAttach()方法就不会走。
+
+    7.Fragment如何实现类似Activity的出栈压栈效果？
+        不管是通过replace()或者add()方式替换添加Fragment，如果我们在替换的时候没有将当前Fragment添加到回退栈中，那么这个
+        Fragment的实例就会被销毁，所以返回的时候就不会返回到上一个Fragment中，而是直接返回到上一个Activity中。如果我们将
+        Fragment添加到了回退栈中，那么这个Fragmetn的实例就不会被销毁，当点击返回键的之后就会返回到上一个Fragment中。而
+        add()方式不会重新创建视图，但是replace()的方式会重新进行视图的构建，这里只是视图的构建，Fragment实例是没有被销毁的。
+        所以我们要实现类似Activity的出栈压栈效果，只需要在替换Fragment的时候将当前Fragment通过addToBackStack()添加到回退栈中即可。
+
+    8. FragmentPagerAdapter与FragmentStatePagerAdapter的区别？
+        (1)由于FragmentStatePagerAdapter在destroyItem()的时候会调用transaction.remove(fragment)，会回收内存，而页面比较多
+            的时候，就比较消耗内存，所以FragmentStatePagerAdapter适合于页面比较多的情况。
+        (2)FragmentPagerAdapter在destroyItem()的时候调用transaction.detach(fragment)，没有回收内存，只是将fragment与activity
+            的UI进行分离，所以FragmentPagerAdapter适合于页面比较少的情况。
+        总结：FragmentPagerAdapter适用于页面较少的情况，FragmentStatePagerAdapter适用于页面较多的情况。
+
+    9.commit方法为什么一定要在Activity的onSaveInstance()之前调用？
+        Activity被系统回收(界面已经不存在了),为了能在下次打开的时候恢复原来的样子，系统为我们保存界面的所有状态，这个时候再去
+        修改界面理论上肯定是不被允许的。
+        为了避免这种异常可以使用:
+            transaction.commitAllowingStateLoss();
+        提交添加Fragment到Activity的事务，与commit()不同的是使用这种方法允许丢失界面的状态和信息。
+
+    10.ViewPager与Fragment结合使用时的懒加载问题
+        所谓的 “懒加载” 就是数据只有在Fragment对于用户可见的时才进行加载。因为ViewPager会帮我们预先初始化Fragment。由于这个特
+        性，我们不能把数据的加载放到onCreateView()或者onCreate()中。因此，我们需要判定Fragment在什么时候是处于可见的状态。一般
+        我们通常是通过Fragment中的生命周期方法onResume()来判断Fragment是否可见，但是由于ViewPager预加载的特性,Fragment即便不可见
+        也会执行onResume方法，因此使用这个方法进行可见性的判断就行不通了。这个时候我们需要用到下面的这个方法来进行Fragment可见性
+        的判断:
+
+        setUserVisibleHint()方法:
+
+        当fragment被创建的时,setUserVisibleHint(boolean isVisibleToUser)方法会被调用，且传入参数值为false。
+
+        当fragment可见时,setUserVisibleHint(boolean isVisibleToUser)方法会被调用，且传入参数值为true。
+
+        当fragment由 可见 -> 不可见 时,setUserVisibleHint(boolean isVisibleToUser)方法会被调用，且传入参数值为false。
+
+        所以我们只需要在setUserVisibleHint()方法中等到isVisibleToUser参数的值为true的时候再开始进行数据的加载即可。但是有一点需
+        要需要注意的是setUserVisibleHint()方法是在Fragment的生命周期方法onCreate()之前调用的，也就是说他并不在Fragment的生命周期
+        中。既然是在 onCreate()方法之前被调用，这样就存在许多不确定因素，如果Fragment的View还没有完成初始化之前，就在
+        setUserVisibleHint()方法中进行UI的操作，这样显然会导致空指针的出现。因此我们需要对Fragment创建的View进行缓存,确保缓存的
+        View不为空的情况下我们才可以在setUserVisibleHint方法中进行UI操作。

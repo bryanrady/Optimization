@@ -1,0 +1,189 @@
+package com.bryanrady.optimization.base.fragment;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+/**
+ * 懒加载的Fragment
+ * @author: wangqingbin
+ * @date: 2020/4/13 17:12
+ */
+public abstract class BaseLazyFragment extends Fragment {
+
+    private String TAG;
+    //标记当前Fragment的可见状态
+    private boolean isFragmentVisible;
+    private boolean isFirstVisible;
+    //对Fragment中加载的View进行缓存
+    private View mRootView;
+
+    public BaseLazyFragment(String tag){
+        this.TAG = tag;
+    }
+
+    /**
+     * 当Fragment添加到Activity的时候最先调用此方法
+     *
+     * @param context 上下文对象
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        //获取Fragment之间传递过来的参数
+        Bundle arguments = getArguments();
+        if (arguments != null){
+            initArgs(arguments);
+        }
+    }
+
+    /**
+     * 获取Activity或Fragment中传递过来的参数，选择重写
+     * @param arguments
+     */
+    protected void initArgs(Bundle arguments) {
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("wangqingbin", TAG + " ===>onCreate");
+        //标记是否是第一次开启当前Fragment
+        isFirstVisible = true;
+        //标记Fragment对于用户是否可见
+        isFragmentVisible = false;
+        //缓存Fragment创建出来的View
+        mRootView = null;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(getContentLayoutId(), container, false);
+        initWidget(mRootView);
+        initEvent();
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.d("wangqingbin", TAG + " ===>onViewCreated");
+        if (mRootView == null) {
+            mRootView = view;
+            if (getUserVisibleHint()) {
+                if (isFirstVisible) {
+                    //处于可见状态并且Fragment是第一次开启
+                    onFragmentFirstVisible();
+                    isFirstVisible = false;
+                }
+                onFragmentVisibleChange(true);
+                isFragmentVisible = true;
+            }
+        }
+
+        //直接使用缓存的mRootView
+        super.onViewCreated(mRootView, savedInstanceState);
+    }
+
+    /**
+     * 初始化控件事件，选择重写
+     */
+    private void initEvent() {
+
+    }
+
+    /**
+     * 初始化组件
+     *
+     * @param view
+     */
+    protected abstract void initWidget(View view);
+
+
+    /**
+     * 当Fragment第一次创建的时候调用,如果不可见则isVisible的参数值为false
+     * 当Fragment对于用户可见时调用,此时的isVisibleToUser参数值为true
+     * 当Fragment当前的状态由可见变为不可见时调用,此时的isVisibleToUser参数为false
+     * @param isVisibleToUser true : 可见
+     *                        false : 不可见
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Log.d("wangqingbin", TAG + " ==> setUserVisibleHint ");
+        super.setUserVisibleHint(isVisibleToUser);
+        //setUserVisibleHint()的调用在Fragment的声明周期外调用,需要保证mRootView不为空的时候调用 onFragmentVisibleChange方法
+        if (mRootView == null) {
+            return;
+        }
+
+        //第一次被开启,并且对用户可见(这个if语句中的判断一般不会被执行到,setUserVisibleHint方法的调用时mRootView还没有被缓存)
+        if (isFirstVisible && isVisibleToUser) {
+            //当Fragment第一次可见的时候调用
+            onFragmentFirstVisible();
+            isFirstVisible = false;
+            return;
+        }
+
+        //Fragment对于用户可见(已经不是第一次开启)
+        if (isVisibleToUser) {
+            onFragmentVisibleChange(true);
+            isFragmentVisible = true;
+            return;
+        }
+
+        //能执行到这里表明 Fragment对于用户已经处于不可见的状态
+        if (isFragmentVisible) {
+            //由 可见 -> 不可见
+            isFragmentVisible = false;
+            onFragmentVisibleChange(false);
+        }
+    }
+
+    /**
+     * 获取填充Fragment的View的id
+     *
+     * @return
+     */
+    protected abstract int getContentLayoutId();
+
+
+    /**
+     * 当Fragment的状态发生变化的时候调用,用于进行数据的刷新
+     *
+     * @param isVisible true  不可见 -> 可见
+     *                  false 可见  -> 不可见
+     */
+    protected abstract void onFragmentVisibleChange(boolean isVisible);
+
+    /**
+     * 当Fragment第一次被开启的时候调用,用于请求数据
+     */
+    protected abstract void onFragmentFirstVisible();
+
+    /**
+     * 获取当前Fragment的可见状态
+     *
+     * @return
+     */
+    protected boolean isFragmentVisible() {
+        return isFragmentVisible;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //标记是否是第一次开启当前Fragment
+        isFirstVisible = true;
+        //标记Fragment对于用户是否可见
+        isFragmentVisible = false;
+        //缓存Fragment创建出来的View
+        mRootView = null;
+    }
+
+}

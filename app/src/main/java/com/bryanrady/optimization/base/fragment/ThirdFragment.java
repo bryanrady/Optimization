@@ -23,83 +23,82 @@ import com.bryanrady.optimization.R;
  */
 public class ThirdFragment extends Fragment{
 
-    private static final String TAG = "ThirdFragment";
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG,"onCreateView");
+        Log.d("wangqingbin","ThirdFragment onCreateView");
         View view = inflater.inflate(R.layout.fragment_statck_content, container, false);
         initView(view);
         return view;
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG,"onAttach");
+        Log.d("wangqingbin","ThirdFragment onAttach");
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"onCreate");
+        Log.d("wangqingbin","ThirdFragment onCreate");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated");
+        Log.d("wangqingbin","ThirdFragment onActivityCreated");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG,"onStart");
+        Log.d("wangqingbin","ThirdFragment onStart");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"onResume");
+        Log.d("wangqingbin","ThirdFragment onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG,"onPause");
+        Log.d("wangqingbin","ThirdFragment onPause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG,"onStop");
+        Log.d("wangqingbin","ThirdFragment onStop");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG,"onDestroyView");
+        Log.d("wangqingbin","ThirdFragment onDestroyView");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG,"onDestroy");
+        Log.d("wangqingbin","ThirdFragment onDestroy");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG,"onDetach");
+        Log.d("wangqingbin","ThirdFragment onDetach");
     }
 
     private void initView(View view){
         Button jump = view.findViewById(R.id.btn_jump);
         jump.setText("Third Fragment");
+        jump.setAllCaps(false);
         EditText etContent = view.findViewById(R.id.et_content);
         etContent.setText("Third Fragment");
+        etContent.setAllCaps(false);
     }
 
 }

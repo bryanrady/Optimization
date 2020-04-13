@@ -161,6 +161,7 @@
         <activity android:name=".base.fragment.FragmentStaticUseActivity" />
         <activity android:name=".base.fragment.FragmentDynamicUseActivity" />
         <activity android:name=".base.fragment.FragmentBackStackActivity" />
+        <activity android:name=".base.fragment.FragmentConfigureChangeActivity" />
 
         <!-- ******************************************************************** -->
 
