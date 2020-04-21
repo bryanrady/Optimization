@@ -42,7 +42,7 @@ public class ProviderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_provider);
 
         mUri = Uri.parse("content://" + MyProvider.AUTHORITIES + "/user");
-
+        mHandler = new ObserverHandler();
         //注册了观察者，只要这个uri对应的Provider有改变，就会回调到这里。
         mContentObserver = new ContentObserver(mHandler) {
             @Override
