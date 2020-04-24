@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
     <Button
-        android:onClick="static_use"
+        android:onClick="old_lazy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
-        android:text="Fragment的静态使用" />
+        android:text="add+hide+show模式下懒加载" />
 
     <Button
         android:onClick="dynamic_use"

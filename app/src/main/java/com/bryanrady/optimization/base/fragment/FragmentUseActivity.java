@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bryanrady.optimization.R;
 import com.bryanrady.optimization.base.component.ComponentActivity;
@@ -38,6 +40,11 @@ public class FragmentUseActivity extends AppCompatActivity {
 
     public void configure_change(View view) {
         Intent intent = new Intent(this, FragmentConfigureChangeActivity.class);
+        startActivity(intent);
+    }
+
+    public void lazy_load(View view) {
+        Intent intent = new Intent(this, FragmentLazyLoadActivity.class);
         startActivity(intent);
     }
 }

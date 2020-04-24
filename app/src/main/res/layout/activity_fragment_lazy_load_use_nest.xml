@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <FrameLayout
+        android:id="@+id/fl_nest_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/ll_nest_bottom" />
+
+    <LinearLayout
+        android:id="@+id/ll_nest_bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/tv_a"
+            android:layout_weight="1"
+            android:text="A"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"/>
+        <TextView
+            android:id="@+id/tv_b"
+            android:layout_weight="1"
+            android:text="B"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#555555"/>
+        <TextView
+            android:id="@+id/tv_c"
+            android:layout_weight="1"
+            android:text="C"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#999999"/>
+    </LinearLayout>
+
+</RelativeLayout>
