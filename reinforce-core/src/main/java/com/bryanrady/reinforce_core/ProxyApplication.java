@@ -74,8 +74,8 @@ public class ProxyApplication extends Application {
                 }
             }
         }else{
-            //第二次后直接从目录中拿，不需要解密了
-            File[] files = appDir.listFiles();
+            //第二次后直接从已经解密好的目录中拿，不需要解密了
+            File[] files = dexDir.listFiles();
             for (File file : files){
                 dexFiles.add(file);
             }
@@ -113,7 +113,7 @@ public class ProxyApplication extends Application {
             return;
         }
         /**
-         * 获得要真正的Application  MyApplication
+         * 获得真正的Application  MyApplication
          */
         Class<?> applicationClass = Class.forName(app_name);
         mRealApplication = (Application) applicationClass.newInstance();
@@ -222,7 +222,7 @@ public class ProxyApplication extends Application {
             Field dexElementsField = ReflexUtils.findField(pathList, "dexElements");
             Object[] dexElements = (Object[]) dexElementsField.get(pathList);
 
-            //(2)创建一个新的elements数组
+            //(2)创建一个新的elements数组，这个数组中包含的是需要加载的dex文件
             Method makeDexElements = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 makeDexElements = ReflexUtils.findMethod(pathList, "makeDexElements",
